@@ -42,7 +42,6 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 <div align="center">
   <h1 align="center">
-      Carga de Empleados.
       <br />
       <img src="./img/1_Empleados.png" alt="Siniestros Viales">
       <br />
@@ -53,7 +52,6 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 <div align="center">
   <h1 align="center">
-      Carga de Configuracion de Relaciones.
       <br />
       <img src="./img/2_Relaciones.png" alt="Siniestros Viales">
       <br />
@@ -64,7 +62,6 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 <div align="center">
   <h1 align="center">
-      Carga de Calificaciones y Calculos.
       <br />
       <img src="./img/3_Evaluaciones.png" alt="Siniestros Viales">
       <br />
@@ -75,7 +72,6 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 <div align="center">
   <h1 align="center">
-      Generar Reportes Estadisticos.
       <br />
       <img src="./img/4_Estadisticas.png" alt="Siniestros Viales">
       <br />
@@ -87,7 +83,6 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 <div align="center">
   <h1 align="center">
-      Evaluación 360 por el Agente de IA.
       <br />
       <img src="./img/5_Feedback.png" alt="Siniestros Viales">
       <br />
@@ -98,7 +93,6 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 <div align="center">
   <h1 align="center">
-      Enviar reporte por correo al Evaluador.
       <br />
       <img src="./img/6_Correo.png" alt="Siniestros Viales">
       <br />
