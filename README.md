@@ -89,7 +89,7 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
   <h1 align="center">
       Evaluación 360 por el Agente de IA.
       <br />
-      <img src="./img/5_Retroalimentacion.png" alt="Siniestros Viales">
+      <img src="./img/5_Feedback.png" alt="Siniestros Viales">
       <br />
   </h1>
 </div>
