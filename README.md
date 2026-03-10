@@ -36,6 +36,8 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 ## Observaciones/Limitaciones
 
+Este sistema implementa una arquitectura RAG basada en datos estructurados que sustituye las bases de datos vectoriales por una fuente de conocimiento en Google Sheets. La gestión se realiza desde Laravel, utilizando plantillas Blade para estandarizar la carga de información. Posteriormente, un flujo automatizado sincroniza estos datos hacia tablas en PostgreSQL, permitiendo que el agente de IA consulte registros organizados y precisos. Esto garantiza una recuperación de datos exacta, auditable y fácilmente gestionable por el equipo administrativo.
+
 ## Workflow
 
 ## 1. Carga de Empleados
