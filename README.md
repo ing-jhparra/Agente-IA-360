@@ -105,3 +105,5 @@ Este sistema implementa una arquitectura RAG basada en datos estructurados que s
       <br />
   </h1>
 </div>
+
+[Descargar JSON de Evaluación 360](https://raw.githubusercontent.com/ing-jhparra/Agente-IA-360/refs/heads/main/scripts/Evaluacion%20360.json)
