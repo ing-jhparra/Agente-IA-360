@@ -19,10 +19,15 @@ Este proceso automatizado con un agente de IA como Consultor 360 resuelve el ses
 
 ## Stack Tecnológico
 - **Orquestador**: n8n (1.123.22).
+- **Backend & Carga de Datos**: Laravel (utilizando plantillas Blade para la estandarización).
+- **Fuente de Entrada**: Google Sheets (como interfaz de gestión administrativa).
+- **Base de Datos Relacional**: PostgreSQL (donde se consolidan y estructuran los datos de evaluación tras el flujo de sincronización).
 - **LLM**: OpenAI GPT-4o.
-- **Vector Store**: 
-- **Embeddings**: 
-- **Arquitectura RAG**: El flujo de los datos, se maneja de forma cíclica y estructurada a través de las siguientes etapas:
+- **Metodología RAG**: Recuperación de contexto basada en datos estructurados (SQL) en lugar de búsqueda vectorial tradicional.
+
+## Arquitectura RAG: 
+
+El flujo de los datos, se maneja de forma cíclica y estructurada a través de las siguientes etapas:
 
 1. **Entrada de Datos (Carga Masiva)**: La información inicial (nombres, cargos, correos, etc.) se extrae desde un Google Sheet para alimentar la base de datos de empleados.
 
