@@ -1,0 +1,2708 @@
+{
+  "name": "Evaluacion 360",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 1. Flujo para la carga de Empleados\n### Se esta utilizado un Google Sheet para la carga de empleado, los atributos para la tabla  es:\n- nombre_empleado\n- apellido_empleado\n- fecha_ingreso\n- cargo\n- nombres_apellidos\n- identificacion\n- correo\n- id_unidad\n\n### Se requiere una unica carga masiva y en  el futuro crear un modulo de insercion de empleado\n\n\n\n\n\n\n",
+        "height": 800,
+        "width": 896
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4688,
+        4304
+      ],
+      "id": "65264e1f-7b32-4a1e-85f4-78a6bffd7499",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3376,
+        2896
+      ],
+      "id": "fe80c592-8755-47d5-9ea1-c69707a62e0d",
+      "name": "Procesar evaluacion"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT buscar_id_relacion_evaluacion('{{ $json.Evaluado }}','{{ $json.Evaluador }}') AS id_relacion, buscar_id_area_competencia('{{ $json['Area Competencia'] }}') AS id_area_competencia;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3152,
+        2832
+      ],
+      "id": "0d531e76-a649-4c60-9790-8fcce1fe634d",
+      "name": "Buscar id relacion y competencia",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e92317f4-b66f-4f94-bd81-2a119577efce",
+              "name": "id_relacion_evaluacion",
+              "value": "={{ $json.id_relacion }}",
+              "type": "number"
+            },
+            {
+              "id": "fa19bcd8-31e1-4778-b18c-0958e15a3f54",
+              "name": "id_area_competencia",
+              "value": "={{ $json.id_area_competencia }}",
+              "type": "number"
+            },
+            {
+              "id": "4cb61c76-62c0-40df-b3bf-4fc958dd8565",
+              "name": "calificacion",
+              "value": "={{ $('Procesar evaluacion').item.json.Calificacion }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2928,
+        2832
+      ],
+      "id": "caa1deaf-d14a-4d97-9872-be3eeeeb69ae",
+      "name": "Preparar valores para insertar"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT buscar_registro_calificacion({{ $json.id_relacion_evaluacion }}, {{ $json.id_area_competencia }}, {{ $json.calificacion }}) AS id_relacion;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2704,
+        2832
+      ],
+      "id": "7b61d482-ef51-4576-8b21-abcf23ac24d8",
+      "name": "Buscar registro de calificacion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1a88e172-823a-49ec-85a0-5515866ca40d",
+              "leftValue": "={{ $json.id_relacion }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2480,
+        2896
+      ],
+      "id": "ecd694cb-597d-4acd-909f-7c4b7d71ef3e",
+      "name": "¿ No existe registro ?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL insertar_detalle_evaluacion({{ $('Preparar valores para insertar').item.json.id_relacion_evaluacion }}, {{ $('Preparar valores para insertar').item.json.id_area_competencia }}, {{ $('Preparar valores para insertar').item.json.calificacion }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2256,
+        2896
+      ],
+      "id": "bfffee21-bd35-4378-a7ca-e99d780ee239",
+      "name": "Insertar registro de evaluacion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Siguiente evaluacion",
+      "typeVersion": 1,
+      "position": [
+        -2032,
+        2976
+      ],
+      "id": "148c0a81-ade8-4519-aff1-15f2542a1a87"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL actualizar_promedios_totales();",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3152,
+        2640
+      ],
+      "id": "fb93e5db-d2c8-4625-9693-959cae0befc7",
+      "name": "Calcular y actualizar totales",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a9a5e57-58ba-4eec-88b6-51439b1596a0",
+              "name": "fecha",
+              "value": "={{ $json['Fecha '] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3232,
+        3728
+      ],
+      "id": "2524fe15-813b-4185-9065-555d467b65b4",
+      "name": "Seleccionar fecha",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputDate = $input.first().json.fecha;\n\nconsole.log('DEBUG - Valor recibido:', {\n  valor: inputDate,\n  tipo: typeof inputDate,\n  esNumero: typeof inputDate === 'number',\n  valorString: String(inputDate)\n});\n\nif (!inputDate && inputDate !== 0) {\n  return [{ json: { fecha_formateada: null, error: 'Fecha vacía' } }];\n}\n\ntry {\n  let dateObj;\n  const strValue = String(inputDate).trim();\n  \n  // CASO 1: Si es un número pequeño (como 29.0) - probablemente es solo el día\n  const numValue = parseFloat(strValue);\n  \n  if (!isNaN(numValue) && numValue < 32 && numValue > 0) {\n    // Es solo un día (1-31), falta mes y año\n    console.log('Parece ser solo un día del mes:', numValue);\n    \n    // Si solo tenemos el día, usamos la fecha actual\n    const today = new Date();\n    const currentYear = today.getFullYear();\n    const currentMonth = today.getMonth(); // 0-11\n    \n    // Validar día\n    const day = Math.floor(numValue);\n    if (day < 1 || day > 31) {\n      throw new Error(`Día ${day} fuera de rango`);\n    }\n    \n    dateObj = new Date(currentYear, currentMonth, day);\n    console.log('Usando fecha actual con día proporcionado:', dateObj);\n    \n  } \n  // CASO 2: Si es un número serial de Google Sheets (grande, > 40000 para fechas recientes)\n  else if (!isNaN(numValue) && numValue > 40000) {\n    console.log('Parece ser número serial de Google Sheets:', numValue);\n    \n    // Convertir serial de Google Sheets a fecha\n    // Google Sheets: 1 = 1 enero 1900\n    const millisecondsPerDay = 24 * 60 * 60 * 1000;\n    const offsetDays = 25569; // Días entre 1900-01-01 y 1970-01-01\n    \n    dateObj = new Date((numValue - offsetDays) * millisecondsPerDay);\n    console.log('Fecha convertida desde serial:', dateObj);\n    \n  }\n  // CASO 3: Si es string con formato de fecha\n  else if (strValue.includes('/')) {\n    console.log('Parece ser fecha con formato DD/MM/YYYY:', strValue);\n    \n    const parts = strValue.split('/');\n    if (parts.length === 3) {\n      const day = parseInt(parts[0], 10);\n      const month = parseInt(parts[1], 10) - 1;\n      const year = parseInt(parts[2], 10);\n      \n      dateObj = new Date(year, month, day);\n    }\n  }\n  // CASO 4: Intentar como fecha ISO\n  else {\n    dateObj = new Date(strValue);\n  }\n  \n  // Validar fecha\n  if (!dateObj || isNaN(dateObj.getTime())) {\n    throw new Error('No se pudo crear una fecha válida');\n  }\n  \n  // Formatear\n  const year = dateObj.getFullYear();\n  const month = String(dateObj.getMonth() + 1).padStart(2, '0');\n  const day = String(dateObj.getDate()).padStart(2, '0');\n  \n  const formattedDate = `${year}-${month}-${day}`;\n  \n  console.log('Resultado final:', formattedDate);\n  \n  return [{ \n    json: { \n      fecha_original: inputDate,\n      fecha_formateada: formattedDate,\n      año: year,\n      mes: month,\n      dia: day,\n      timestamp: dateObj.getTime()\n    } \n  }];\n  \n} catch (error) {\n  console.error('Error:', error);\n  return [{ \n    json: { \n      fecha_original: inputDate,\n      fecha_formateada: null,\n      error: error.message \n    } \n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3008,
+        3728
+      ],
+      "id": "ab542b91-3641-4835-a592-8848951fae6f",
+      "name": "Formatear fecha"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64dd88c1-7634-43ef-bd1f-b49546943579",
+              "name": "tipo_relacion",
+              "value": "={{ $('Procesar configuracion').item.json['Tipo de relacion'] }}",
+              "type": "string"
+            },
+            {
+              "id": "e9cd2347-ba6f-4d1e-b44d-7608045ca8cf",
+              "name": "empleado_evaluado",
+              "value": "={{ $('Procesar configuracion').item.json.Evaluado }}",
+              "type": "string"
+            },
+            {
+              "id": "4b94b438-825c-40fc-b139-1b07cd00e146",
+              "name": "empleado_evaluador",
+              "value": "={{ $('Procesar configuracion').item.json.Evaluador }}",
+              "type": "string"
+            },
+            {
+              "id": "13d2a671-13dc-47d5-8fc8-a999a75e60b2",
+              "name": "fecha",
+              "value": "={{ $json.fecha_formateada }}",
+              "type": "string"
+            },
+            {
+              "id": "ea09220b-a653-46bb-9c6b-89e1cb618529",
+              "name": "periodo",
+              "value": "={{ $('Procesar configuracion').item.json.Periodo }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2784,
+        3728
+      ],
+      "id": "6ae42121-c502-45bd-8c1c-3ba2393ee015",
+      "name": "Seleccionar atributos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "19a7ec46-f229-49e4-8426-04733d73f01f",
+              "name": "id_tipo_relacion",
+              "value": "={{ $json.fn_obtener_tipo_relacion_json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "45ec092c-4d85-496c-aeef-20af4ad53a84",
+              "name": "descripcion_relacion",
+              "value": "={{ $json.fn_obtener_tipo_relacion_json.descripcion }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2112,
+        3536
+      ],
+      "id": "02bafdfd-4db0-44aa-bf59-85e69f795c14",
+      "name": "Seleccionar id_relacion y descripcion"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dbcb891e-6aa3-423e-bf28-b7905e6ba761",
+              "name": "empleado_evaluado",
+              "value": "={{ $json.buscar_empleado_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2336,
+        3728
+      ],
+      "id": "86ce76b3-5f91-490f-bc30-30ca5b17075e",
+      "name": "Seleccionar evaluado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dbcb891e-6aa3-423e-bf28-b7905e6ba761",
+              "name": "empleado_evaluador",
+              "value": "={{ $json.buscar_empleado_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2336,
+        3920
+      ],
+      "id": "fc15f031-010a-4f67-a671-2b9544c312a9",
+      "name": "Seleccionar evaluador"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2112,
+        3920
+      ],
+      "id": "a0a01336-d24b-4969-a0f1-bc8f75c3bfbc",
+      "name": "Agrupar evaluado y evaluador"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1888,
+        3824
+      ],
+      "id": "437362df-282a-4d3c-ac19-eadc8da8e423",
+      "name": "Agrupar datos de relacion"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT buscar_relacion_evaluacion({{ $json.empleado_evaluador }}, {{ $json.empleado_evaluado }}, {{ $json.id_tipo_relacion }}) AS id_relacion;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1664,
+        3824
+      ],
+      "id": "18041e8b-8a9b-443c-b31a-61aaf8ef683e",
+      "name": "Buscar relacion",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "859d2f57-91be-4332-8019-bddcf80f8414",
+              "leftValue": "={{ $json.id_relacion }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1440,
+        3824
+      ],
+      "id": "eb5a6bf2-73e0-4ce0-b48e-8661d470c904",
+      "name": "¿ No existe relacion ?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL insertar_relacion_evaluacion(\n    '{{ $('Agrupar datos de relacion').item.json.descripcion_relacion }}',\n    {{ $('Agrupar datos de relacion').item.json.empleado_evaluado }},\n    {{ $('Agrupar datos de relacion').item.json.empleado_evaluador }},\n    '{{ $('Seleccionar atributos').item.json.fecha }}',\n    {{ $('Agrupar datos de relacion').item.json.id_tipo_relacion }},\n  {{ $('Procesar configuracion').item.json.Periodo }}\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1216,
+        3760
+      ],
+      "id": "07e07dd2-ba17-4373-bdf6-7e18ba291940",
+      "name": "Insertar registro de relacion",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Siguiente relacion",
+      "typeVersion": 1,
+      "position": [
+        -992,
+        4000
+      ],
+      "id": "7a952537-c6a9-4f9e-a434-0397b8940b8d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13d2a671-13dc-47d5-8fc8-a999a75e60b2",
+              "name": "fecha_ingreso",
+              "value": "={{ $json['Fecha de Ingreso'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3264,
+        4672
+      ],
+      "id": "c331ae81-2a13-4951-a0d5-cdcc99a6f836",
+      "name": "Seleccionar fecha de ingreso"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputDate = $input.first().json.fecha_ingreso;\n\nconsole.log('DEBUG - Valor recibido:', {\n  valor: inputDate,\n  tipo: typeof inputDate,\n  esNumero: typeof inputDate === 'number',\n  valorString: String(inputDate)\n});\n\nif (!inputDate && inputDate !== 0) {\n  return [{ json: { fecha_formateada: null, error: 'Fecha vacía' } }];\n}\n\ntry {\n  let dateObj;\n  const strValue = String(inputDate).trim();\n  \n  // CASO 1: Si es un número pequeño (como 29.0) - probablemente es solo el día\n  const numValue = parseFloat(strValue);\n  \n  if (!isNaN(numValue) && numValue < 32 && numValue > 0) {\n    // Es solo un día (1-31), falta mes y año\n    console.log('Parece ser solo un día del mes:', numValue);\n    \n    // Si solo tenemos el día, usamos la fecha actual\n    const today = new Date();\n    const currentYear = today.getFullYear();\n    const currentMonth = today.getMonth(); // 0-11\n    \n    // Validar día\n    const day = Math.floor(numValue);\n    if (day < 1 || day > 31) {\n      throw new Error(`Día ${day} fuera de rango`);\n    }\n    \n    dateObj = new Date(currentYear, currentMonth, day);\n    console.log('Usando fecha actual con día proporcionado:', dateObj);\n    \n  } \n  // CASO 2: Si es un número serial de Google Sheets (grande, > 40000 para fechas recientes)\n  else if (!isNaN(numValue) && numValue > 40000) {\n    console.log('Parece ser número serial de Google Sheets:', numValue);\n    \n    // Convertir serial de Google Sheets a fecha\n    // Google Sheets: 1 = 1 enero 1900\n    const millisecondsPerDay = 24 * 60 * 60 * 1000;\n    const offsetDays = 25569; // Días entre 1900-01-01 y 1970-01-01\n    \n    dateObj = new Date((numValue - offsetDays) * millisecondsPerDay);\n    console.log('Fecha convertida desde serial:', dateObj);\n    \n  }\n  // CASO 3: Si es string con formato de fecha\n  else if (strValue.includes('/')) {\n    console.log('Parece ser fecha con formato DD/MM/YYYY:', strValue);\n    \n    const parts = strValue.split('/');\n    if (parts.length === 3) {\n      const day = parseInt(parts[0], 10);\n      const month = parseInt(parts[1], 10) - 1;\n      const year = parseInt(parts[2], 10);\n      \n      dateObj = new Date(year, month, day);\n    }\n  }\n  // CASO 4: Intentar como fecha ISO\n  else {\n    dateObj = new Date(strValue);\n  }\n  \n  // Validar fecha\n  if (!dateObj || isNaN(dateObj.getTime())) {\n    throw new Error('No se pudo crear una fecha válida');\n  }\n  \n  // Formatear\n  const year = dateObj.getFullYear();\n  const month = String(dateObj.getMonth() + 1).padStart(2, '0');\n  const day = String(dateObj.getDate()).padStart(2, '0');\n  \n  const formattedDate = `${year}-${month}-${day}`;\n  \n  console.log('Resultado final:', formattedDate);\n  \n  return [{ \n    json: { \n      fecha_original: inputDate,\n      fecha_formateada: formattedDate,\n      año: year,\n      mes: month,\n      dia: day,\n      timestamp: dateObj.getTime()\n    } \n  }];\n  \n} catch (error) {\n  console.error('Error:', error);\n  return [{ \n    json: { \n      fecha_original: inputDate,\n      fecha_formateada: null,\n      error: error.message \n    } \n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3040,
+        4672
+      ],
+      "id": "2fc8b7d2-8e22-409e-9f8e-3e41e3816d2f",
+      "name": "Formatear fecha de ingreso"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64dd88c1-7634-43ef-bd1f-b49546943579",
+              "name": "nombre_empleado",
+              "value": "={{ $('Procesar empleados').item.json.Nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "e9cd2347-ba6f-4d1e-b44d-7608045ca8cf",
+              "name": "apellido_empleado",
+              "value": "={{ $('Procesar empleados').item.json.Apellido }}",
+              "type": "string"
+            },
+            {
+              "id": "cc703247-961e-472e-805f-5b76591a5f26",
+              "name": "nombres_apellidos",
+              "value": "={{ $('Procesar empleados').item.json['Nombre y Apellido'] }}",
+              "type": "string"
+            },
+            {
+              "id": "4b94b438-825c-40fc-b139-1b07cd00e146",
+              "name": "cargo",
+              "value": "={{ $('Procesar empleados').item.json.Cargo }}",
+              "type": "string"
+            },
+            {
+              "id": "13d2a671-13dc-47d5-8fc8-a999a75e60b2",
+              "name": "fecha_ingreso",
+              "value": "={{ $json.fecha_formateada }}",
+              "type": "string"
+            },
+            {
+              "id": "439b210c-82b4-460a-a26e-1dbaa3fa0703",
+              "name": "unidad",
+              "value": "={{ $('Procesar empleados').item.json.Unidad }}",
+              "type": "string"
+            },
+            {
+              "id": "f3a9742b-225a-479e-94ec-1efce89fc754",
+              "name": "identificacion",
+              "value": "={{ $('Procesar empleados').item.json.identificacion }}",
+              "type": "number"
+            },
+            {
+              "id": "c471ec81-dd46-4151-a1c5-0e20e1cfdf45",
+              "name": "correo",
+              "value": "={{ $('Procesar empleados').item.json.Correo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2816,
+        4672
+      ],
+      "id": "14a1f1c9-305d-4ac2-bb73-9df16059005e",
+      "name": "Seleccionar atributos de empleados"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM buscar_empleado_identificacion('{{ $json.identificacion }}') AS encontrado;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2592,
+        4672
+      ],
+      "id": "3b7bbb6d-dc6b-4a64-9820-41bfda67b1dd",
+      "name": "Buscar empleado",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://quickchart.io/chart?width={{ $json.width }}&height={{ $json.height }}&chart={{ $json.chartConfig }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "radar"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2656,
+        1552
+      ],
+      "id": "f7b6ec05-6554-46a5-bb21-0c97e584e222",
+      "name": "Obtener grafica radar"
+    },
+    {
+      "parameters": {
+        "url": "=https://quickchart.io/chart?v=2.9.4&c={{ $json.chartConfig }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "maxmin"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2656,
+        1744
+      ],
+      "id": "87cc700d-a892-4a59-91ed-433ebdeeec90",
+      "name": "Obtener grafica max y min"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3328,
+        1920
+      ],
+      "id": "faff086a-5eb8-4756-bb12-a09f37dcfc5d",
+      "name": "Procesar reporte del evaluado"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM obtener_datos_evaluacion_empleado({{ $json.id_evaluado }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3104,
+        1552
+      ],
+      "id": "f0514f72-e498-4b5a-9b8b-2d3ae2cb0a27",
+      "name": "Obtener resultados de evaluacion",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM obtener_max_min_competencias({{ $json.id_evaluado }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3104,
+        1744
+      ],
+      "id": "ee774a07-6a04-4a8d-a4e5-2910dab3484f",
+      "name": "Obtener valor minimo y maimo",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let labels = $input.first().json.variables;\nif (typeof labels === 'string') {\n    labels = JSON.parse(labels);\n}\n\nlet scores = $input.first().json.valores;\n\nif (typeof scores === 'string') {\n    scores = JSON.parse(scores);\n}\n\nconst chartConfig = {\n  type: 'radar',\n  data: {\n    labels: labels,\n    datasets: [{\n      label: 'Puntuaciones',\n      data: scores,\n      backgroundColor: 'rgba(173, 216, 230, 0.2)',\n      borderColor: 'black',\n      borderWidth: 1\n    }]\n  },\n  options: {\n    legend: {\n        display: false\n    },\n    scales: {\n      r: {\n        min: 1,\n        max: 5,\n        ticks: { \n          stepSize: 1, \n          color: 'black', \n          font: {\n            size: 6 // Tamaño de los números del eje\n          } \n        },\n        grid: { color: 'black' },\n        angleLines: { color: 'black' },\n        pointLabels: { \n           color: 'blue',\n           font: {\n            size: 8, // ¡AQUÍ MODIFICAS EL TAMAÑO DE LOS LABELS!\n            family: \"'Arial', 'Helvetica', sans-serif\",\n            weight: 'bold'\n          }\n        }\n      }\n    },\n    elements: { line: { tension: 0.1 } }\n  }\n};\n\n// Usa HTTP Request node después de este Code para llamar a QuickChart\nreturn [\n  {\n    json: {\n      chartConfig: JSON.stringify(chartConfig),\n      width: 450,\n      height: 400,\n      backgroundColor: 'white'\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2880,
+        1552
+      ],
+      "id": "fc1a7ab7-3929-43b3-95d0-cd0a1040aa03",
+      "name": "Parametros de grafica radar"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos el item actual\nconst item = items[0]; \n\n// Reemplaza 'data' por el nombre del campo binario que sale de tu nodo HTTP Request\n// Normalmente es 'data', pero verifica en el nodo anterior\nconst binaryPropertyName = 'radar'; \n\n// Obtenemos el buffer del binario\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, binaryPropertyName);\n\n// Convertimos a Base64\nconst base64 = binaryData.toString('base64');\n\n// Devolvemos el HTML listo para usar en tu reporte\nreturn {\n  imgRadar_tag: `<img src=\"data:image/jpeg;base64,${base64}\" style=\"width:70%; max-width:400px;\">`,\n  base64_string: base64\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2432,
+        1552
+      ],
+      "id": "3d4a7a62-7b67-42e2-b437-88edc272b55f",
+      "name": "Radar a HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos todos los ítems que entran al nodo (esperamos solo dos: Máximo y Mínimo)\nconst items = $input.all();\n\n// Extraemos las etiquetas y los valores de los dos ítems (máximo y mínimo)\n// Suponemos que cada item.json tiene las propiedades 'tipo', 'competencia' y 'puntaje'\nconst labels = items.map(item => `${item.json.competencia}`);\nconst dataValues = items.map(item => item.json.puntaje);\n\n// Definimos la configuración del gráfico (tipo 'bar')\nconst chartConfig = {\n  type: 'bar', // Tipo de gráfico de barras\n  data: {\n    labels: labels, // Etiquetas para las barras (ej: \"Máximo: Responsabilidad\", \"Mínimo: Trabajo en Equipo\")\n    datasets: [{\n      label: '', // Etiqueta general para el dataset\n      data: dataValues, // Los dos valores (máximo y mínimo)\n      backgroundColor: [\n        'rgba(75, 192, 192, 0.6)', // Color para el Máximo (o el primero que llega)\n        'rgba(255, 99, 132, 0.6)'  // Color para el Mínimo (o el segundo que llega)\n      ],\n      borderColor: [\n        'rgba(75, 192, 192, 1)',\n        'rgba(255, 99, 132, 1)'\n      ],\n      borderWidth: 1,\n      barThickness: 50, \n    }]\n  },\n  options: {\n    responsive: true,\n    indexAxis: 'y', // Hace que las barras sean horizontales\n    legend: {\n      display: false // Desactivación para Chart.js v2 (QuickChart estándar)\n    },\n    plugins: {\n      legend: {\n        display: false // No mostramos la leyenda, ya que las etiquetas son claras\n      },\n      title: {\n        display: false,\n        text: '' // Título del gráfico\n      }\n    },\n    scales: {\n      x: { // Eje X para los valores de puntaje\n        beginAtZero: true,\n        max: 5, // Escala de 0 a 5, como en tus evaluaciones\n        ticks: {\n          stepSize: 1\n        },\n        title: {\n          display: true,\n          text: ''\n        },\n        grid: {\n          display: true\n        }\n      },\n      y: { // Eje Y para las etiquetas de las competencias\n        grid: {\n          display: false // Oculta las líneas de la cuadrícula vertical\n        }\n      }\n    }\n  }\n};\n\n// Retornamos el formato solicitado para n8n\nreturn [\n  {\n    json: {\n      chartConfig: JSON.stringify(chartConfig),\n      width: 450,\n      height: 400,\n      backgroundColor: 'white'\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2880,
+        1744
+      ],
+      "id": "3c1bda47-d5b3-40c8-9eca-6ad91209fe61",
+      "name": "Parametros Barra vertical"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from obtener_estadisticas_evaluado({{ $json.id_evaluado }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3104,
+        1936
+      ],
+      "id": "fc007701-0cd3-407c-90ab-a2a49035c87f",
+      "name": "Obtener porcentajes por competencias",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos todos los ítems que entran al nodo\nconst items = $input.all();\n\n// Extraemos las etiquetas y los valores\nconst labels = items.map(item => `${item.json.tipo_relacion}`);\nconst dataValues = items.map(item => parseFloat(item.json.porcentaje_cumplimiento.replace('%', '')));\n\n// Configuración para QuickChart (Chart.js v2)\nconst chartConfig = {\n  type: 'horizontalBar',\n  data: {\n    labels: labels,\n    datasets: [\n      {\n        label: '',\n        data: dataValues,\n        backgroundColor: [\n          'rgba(75, 192, 192, 0.6)',\n          'rgba(255, 99, 132, 0.6)',\n          'rgba(54, 162, 235, 0.6)',\n          'rgba(255, 206, 86, 0.6)',\n          'rgba(153, 102, 255, 0.6)'\n        ],\n        borderColor: [\n          'rgba(75, 192, 192, 1)',\n          'rgba(255, 99, 132, 1)',\n          'rgba(54, 162, 235, 1)',\n          'rgba(255, 206, 86, 1)',\n          'rgba(153, 102, 255, 1)'\n        ],\n        borderWidth: 1,\n      },\n    ],\n  },\n  options: {\n    responsive: true,\n    legend: {\n      display: false,\n    },\n    title: {\n      display: false,\n    },\n    scales: {\n      xAxes: [\n        {\n          gridLines: {\n            display: true,\n            drawOnChartArea: false,\n            tickMarkLength: 8,\n            zeroLineWidth: 1,\n            zeroLineColor: 'black',\n            color: 'black',\n          },\n          ticks: {\n            fontColor: 'black',\n            beginAtZero: true,\n            max: 100,\n            stepSize: 10,\n            callback: function(value) {\n              return value + '%';\n            }\n          },\n        },\n      ],\n      yAxes: [\n        {\n          display: true,\n          position: 'left',\n          gridLines: {\n            display: true,\n            drawOnChartArea: false,\n            tickMarkLength: 8,\n            color: 'black',\n          },\n          ticks: {\n            fontColor: 'black',\n            fontStyle: 'bold',\n          },\n          barThickness: 30,\n        },\n      ],\n    },\n    plugins: {\n      datalabels: {\n        display: true,\n        anchor: 'end',\n        align: 'end',\n        color: 'black',\n        formatter: function (value, context) {\n          return value + '%';\n        },\n        font: {\n          size: 12,\n          weight: 'bold',\n        },\n      },\n    }\n  }\n};\n\n// Retornamos el formato para n8n\nreturn [\n  {\n    json: {\n      chartConfig: JSON.stringify(chartConfig),\n      width: 500,\n      height: 300,\n      backgroundColor: 'white',\n      labels: labels,\n      values: dataValues\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2880,
+        1936
+      ],
+      "id": "0b7908c4-8c8b-4fdf-9470-fbb8dcf55a5b",
+      "name": "Parametros Barra horizonal"
+    },
+    {
+      "parameters": {
+        "url": "=https://quickchart.io/chart?v=2.9.4&c={{ $json.chartConfig }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "laboral"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2656,
+        1936
+      ],
+      "id": "0a6ac553-d29b-4d43-96e5-a1d0eed3d214",
+      "name": "Obtener grafica horizontal"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos el item actual\nconst item = items[0]; \n\n// Reemplaza 'data' por el nombre del campo binario que sale de tu nodo HTTP Request\n// Normalmente es 'data', pero verifica en el nodo anterior\nconst binaryPropertyName = 'maxmin'; \n\n// Obtenemos el buffer del binario\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, binaryPropertyName);\n\n// Convertimos a Base64\nconst base64 = binaryData.toString('base64');\n\n// Devolvemos el HTML listo para usar en tu reporte\nreturn {\n  imgMaxMin_tag: `<img src=\"data:image/jpeg;base64,${base64}\" style=\"width:70%; max-width:400px;\">`,\n  base64_string: base64\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2432,
+        1744
+      ],
+      "id": "07026c8c-81b9-4553-a168-c23b365cc68a",
+      "name": "Barra vertical a HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos el item actual\nconst item = items[0]; \n\n// Reemplaza 'data' por el nombre del campo binario que sale de tu nodo HTTP Request\n// Normalmente es 'data', pero verifica en el nodo anterior\nconst binaryPropertyName = 'laboral'; \n\n// Obtenemos el buffer del binario\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, binaryPropertyName);\n\n// Convertimos a Base64\nconst base64 = binaryData.toString('base64');\n\n// Devolvemos el HTML listo para usar en tu reporte\nreturn {\n  imgLaboral_tag: `<img src=\"data:image/jpeg;base64,${base64}\" style=\"width:70%; max-width:400px;\">`,\n  base64_string: base64\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2432,
+        1936
+      ],
+      "id": "853eae34-8c36-47d7-bcb7-db96ac4419bc",
+      "name": "Barra horizontal a HTML"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM obtener_estadisticas_evaluacion_simple({{ $json.id_evaluado }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2656,
+        2128
+      ],
+      "id": "069a3856-f2be-4cfa-ac8f-e81d6c18447f",
+      "name": "Obtener estadisticas",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Mejora de tabla con estilos directos para mayor compatibilidad\n * Azul cielo en encabezado y borde 1px.\n */\nfunction construirTablaEvaluacion(datos) {\n    // Definición de colores\n    const azulCielo = \"#87CEEB\";\n    const grisBorde = \"#dddddd\";\n\n    let html = `\n    <table style=\"width: 100%; border-collapse: collapse; border: 1px solid ${grisBorde}; font-family: Arial, sans-serif; font-size: 13px;\">\n        <thead>\n            <tr style=\"background-color: ${azulCielo}; color: #333;\">\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: left;\">Competencia</th>\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: center;\">Puntaje</th>\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: center;\">%</th>\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: center;\">Supervisor</th>\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: center;\">Subordinado</th>\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: center;\">Par</th>\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: center;\">Cliente</th>\n                <th style=\"border: 1px solid ${grisBorde}; padding: 10px; text-align: center;\">Autoevaluación</th>\n            </tr>\n        </thead>\n        <tbody>`;\n    \n    for (const item of datos) {\n        const json = item.json;\n        const puntaje = parseFloat(json.puntaje || json.promedio || 0);\n        const porcentaje = parseFloat(json.porcentaje || 0);\n        const auto = parseFloat(json.auto || json.autoevaluacion || 0);\n        \n        html += `\n        <tr>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px;\">${json.competencia || json.nombre || 'N/A'}</td>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px; text-align: center; ${obtenerEstiloPuntaje(puntaje)}\">\n                ${puntaje.toFixed(2)}\n            </td>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px; text-align: center; ${obtenerEstiloPorcentaje(porcentaje)}\">\n                ${porcentaje}%\n            </td>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px; text-align: center;\">${json.supervisor || json.jefe || '0.0'}</td>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px; text-align: center;\">${json.subordinado || '0.0'}</td>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px; text-align: center;\">${json.par || '0.0'}</td>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px; text-align: center;\">${json.cliente || '0.0'}</td>\n            <td style=\"border: 1px solid ${grisBorde}; padding: 8px; text-align: center; ${obtenerEstiloAuto(auto)}\">\n                ${auto.toFixed(1)}\n            </td>\n        </tr>`;\n    }\n    \n    html += `</tbody></table>`;\n    return html;\n}\n\n// Funciones auxiliares con Estilos CSS en línea (In-line styles)\nfunction obtenerEstiloPuntaje(puntaje) {\n    if (puntaje >= 4.5) return 'color: #1a7f37; font-weight: bold;';\n    if (puntaje >= 3.5) return 'color: #0969da;';\n    if (puntaje >= 2.5) return 'color: #9a6700;';\n    return 'color: #cf222e;';\n}\n\nfunction obtenerEstiloPorcentaje(porcentaje) {\n    if (porcentaje >= 90) return 'color: #1a7f37; font-weight: bold;';\n    if (porcentaje >= 70) return 'color: #0969da;';\n    return 'color: #cf222e;';\n}\n\nfunction obtenerEstiloAuto(auto) {\n    if (auto >= 4.5) return 'background-color: #dafbe1;';\n    if (auto >= 3.5) return 'background-color: #ddf4ff;';\n    return 'background-color: #fff8c5;';\n}\n\n// Ejecución en el nodo de n8n\nconst items = $input.all();\nconst tablaHTML = construirTablaEvaluacion(items);\nreturn [{ json: { tabla_html: tablaHTML } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2432,
+        2128
+      ],
+      "id": "ca48341b-f8af-4320-9542-5c3a58299258",
+      "name": "Convertir tabla de estadisticas a HTML"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 4,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2208,
+        1808
+      ],
+      "id": "7198c31f-3732-4fa0-9916-1dfd623bd515",
+      "name": "Consolidar objeto de la plantilla",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Siguiente empleado1",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        2016
+      ],
+      "id": "c891401d-0172-4cb6-a8a3-fba983a00cd8"
+    },
+    {
+      "parameters": {
+        "content": "## Flujo 3. Cargar de Evaluacion y Calculos",
+        "height": 800,
+        "width": 896,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4672,
+        2512
+      ],
+      "id": "ad378cc2-b1f7-4599-b191-c8b37c997604",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Flujo de carga Configuracion de Relaciones\n- Supervisor\n- Subordinado\n- Par o Externo\n- Cliente\n- Autoevaluacion\n\n## Formulario de Configuracion  de Relaciones\n- https://configurar-relaciones.pages.dev/",
+        "height": 768,
+        "width": 896,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4688,
+        3424
+      ],
+      "id": "00bc9c8f-4fc8-430c-ac07-c8d032528abd",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Flujo 4. Generar reportes estadisticos",
+        "height": 992,
+        "width": 912,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4688,
+        1392
+      ],
+      "id": "945d3452-4bd7-4340-a024-6ec3d066f446",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM obtener_evaluados_con_info();",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3552,
+        880
+      ],
+      "id": "c1704dd4-f20e-4836-98a4-df37f8585d6d",
+      "name": "Obtener ids de evaluados1",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3328,
+        880
+      ],
+      "id": "78e70fdb-c9c8-446c-bc1d-c99ea2c56ab5",
+      "name": "Procesar evaluados1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Modo: Run Once for All Items\n\nconst items = [];\n\nfor (let i = 0; i < $input.all().length; i++) {\n  let item = $input.all()[i].json;\n  \n  // Si evaluado es un string, parsearlo\n  if (typeof item.evaluado === 'string') {\n    try {\n      // Eliminar saltos de línea y espacios innecesarios\n      const cleanedJson = item.evaluado.replace(/\\\\n/g, '').replace(/\\\\\"/g, '\"').trim();\n      item.evaluado = JSON.parse(cleanedJson);\n    } catch (error) {\n      // Si falla, intentar limpiar más\n      const fixedJson = item.evaluado\n        .replace(/\\\\n/g, '')\n        .replace(/\\\\t/g, '')\n        .replace(/\\\\r/g, '')\n        .replace(/\\s+/g, ' ')\n        .replace(/\\\\\"/g, '\"')\n        .replace(/\"{/g, '{')\n        .replace(/}\"/g, '}');\n      \n      try {\n        item.evaluado = JSON.parse(fixedJson);\n      } catch (e) {\n        // Si aún falla, dejar el string original\n        item.evaluado = item.evaluado.replace(/\\\\n/g, ' ').replace(/\\s+/g, ' ');\n      }\n    }\n  }\n  \n  items.push({ json: item });\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3104,
+        768
+      ],
+      "id": "14719ae4-8284-4b0b-82f2-837266d96c1b",
+      "name": "Ordenar datos del evaluado1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Siguiente empleado2",
+      "typeVersion": 1,
+      "position": [
+        -1520,
+        880
+      ],
+      "id": "46023313-d6ad-4c71-a07b-b94730b24bc5"
+    },
+    {
+      "parameters": {
+        "content": "## Flujo 5. Evaluacion 360 por la IA",
+        "height": 800,
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4688,
+        480
+      ],
+      "id": "3aefb13d-5478-4d2f-8906-43dfc25819d2",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3488,
+        4672
+      ],
+      "id": "f493a922-5f6b-4efb-9ded-74d62a9e6eda",
+      "name": "Procesar empleados"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos todos los ítems de entrada\nconst items = $input.all();\n// Obtenemos la cantidad de items procesados\nconst cantidadProcesados = items.length;\n\n// Crear el JSON de respuesta con más detalles\nconst respuesta = {\n    metadata: {\n        longitud: cantidadProcesados,\n        unidad: \"registros\",\n        tipo: \"conteo\"\n    },\n    timestamp: new Date().toISOString(),\n    procesamiento: {\n        estado: \"completado\",\n        items_procesados: cantidadProcesados\n    }\n};\n\n// Devolver el JSON\nreturn respuesta;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3264,
+        4480
+      ],
+      "id": "6b1e3ca4-6a7f-4ec0-9ddc-7e761428f912",
+      "name": "Metadato - estado"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FaA7avPSyw67qAg6-dCSdwo1e87qXcJIKrj2SKWXfpM",
+          "mode": "list",
+          "cachedResultName": "Lista de Empleaodos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FaA7avPSyw67qAg6-dCSdwo1e87qXcJIKrj2SKWXfpM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Empleados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FaA7avPSyw67qAg6-dCSdwo1e87qXcJIKrj2SKWXfpM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3712,
+        4672
+      ],
+      "id": "24fb424b-46ab-46e7-9449-c72e18839f7c",
+      "name": "Lista de empleados",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6hep06XLx2w24yJO",
+          "name": "Credenciales Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9732235a-6128-4fda-b36a-1d356c3e26c6",
+              "leftValue": "={{ $json.encontrado }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2368,
+        4672
+      ],
+      "id": "bea9ab9d-36db-4b95-9580-da364c93a6e2",
+      "name": "¿ No Existe empleado?"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "empleado",
+          "mode": "list",
+          "cachedResultName": "empleado"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "apellido_empleado": "={{ $('Seleccionar atributos de empleados').item.json.apellido_empleado }}",
+            "nombre_empleado": "={{ $('Seleccionar atributos de empleados').item.json.nombre_empleado }}",
+            "fecha_ingreso": "={{ $('Seleccionar atributos de empleados').item.json.fecha_ingreso }}",
+            "cargo": "={{ $('Seleccionar atributos de empleados').item.json.cargo }}",
+            "identificacion": "={{ $('Seleccionar atributos de empleados').item.json.identificacion }}",
+            "nombres_apellidos": "={{ $('Seleccionar atributos de empleados').item.json.nombres_apellidos }}",
+            "id_unidad": "={{ $('Seleccionar atributos de empleados').item.json.unidad }}",
+            "correo": "={{ $('Seleccionar atributos de empleados').item.json.correo }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nombre_empleado",
+              "displayName": "nombre_empleado",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "apellido_empleado",
+              "displayName": "apellido_empleado",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_ingreso",
+              "displayName": "fecha_ingreso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cargo",
+              "displayName": "cargo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombres_apellidos",
+              "displayName": "nombres_apellidos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "identificacion",
+              "displayName": "identificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_unidad",
+              "displayName": "id_unidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "correo",
+              "displayName": "correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2144,
+        4608
+      ],
+      "id": "502f4c80-a1ac-4129-a4c4-2d04b0cc7220",
+      "name": "Agregamos empleado",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Siguiente empleado",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        4752
+      ],
+      "id": "1cb2ee61-39af-4d1b-969d-a1cf4813cc7f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3456,
+        3728
+      ],
+      "id": "8b8e2f9e-d232-489e-b5ba-200e2d7f616b",
+      "name": "Procesar configuracion"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos todos los ítems de entrada\nconst items = $input.all();\n// Obtenemos la cantidad de items procesados\nconst cantidadProcesados = items.length;\n\n// Crear el JSON de respuesta con más detalles\nconst respuesta = {\n    metadata: {\n        longitud: cantidadProcesados,\n        unidad: \"registros\",\n        tipo: \"conteo\"\n    },\n    timestamp: new Date().toISOString(),\n    procesamiento: {\n        estado: \"completado\",\n        items_procesados: cantidadProcesados\n    }\n};\n\n// Devolver el JSON\nreturn respuesta;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3232,
+        3536
+      ],
+      "id": "66ab8343-ebd5-489f-844a-683959f9fa07",
+      "name": "Metadato - estado2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1G9dTs2DSvvBBPx725iucWHgQcN8zb4T3DVW6xlneuTg",
+          "mode": "list",
+          "cachedResultName": "Configuracion de Relaciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G9dTs2DSvvBBPx725iucWHgQcN8zb4T3DVW6xlneuTg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Configuraciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G9dTs2DSvvBBPx725iucWHgQcN8zb4T3DVW6xlneuTg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3680,
+        3728
+      ],
+      "id": "5f904318-84d9-4de6-8a21-1def0b62f0f0",
+      "name": "Lista de configuraciones",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6hep06XLx2w24yJO",
+          "name": "Credenciales Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT fn_obtener_tipo_relacion_json('{{ $json.tipo_relacion }}');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2336,
+        3536
+      ],
+      "id": "a259b305-a92f-4360-bb4a-a0b18e51766f",
+      "name": "Obtener relacion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT buscar_empleado_id('{{ $json.empleado_evaluado }}');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2560,
+        3728
+      ],
+      "id": "c1ad93d0-10d5-4cb8-8e69-4082eb72e1a2",
+      "name": "Buscar evaluado",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT buscar_empleado_id('{{ $json.empleado_evaluador }}');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2560,
+        3920
+      ],
+      "id": "b7b56a17-9bf3-44a5-9462-3a7bc2c7f830",
+      "name": "Buscar evaluador",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1vg6aDk8C5VlDR5TKaAugiv6umqHt7a9at11BP1lkWtQ",
+          "mode": "list",
+          "cachedResultName": "Calificaciones de Evaluados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vg6aDk8C5VlDR5TKaAugiv6umqHt7a9at11BP1lkWtQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Calificaciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vg6aDk8C5VlDR5TKaAugiv6umqHt7a9at11BP1lkWtQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3600,
+        2896
+      ],
+      "id": "6cacd302-ca21-4ab2-9f30-0cb93fb71a2b",
+      "name": "Leer evaluaciones",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6hep06XLx2w24yJO",
+          "name": "Credenciales Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL insertar_evaluacion_final({{ $('Procesar reporte del evaluado').item.json.id_evaluado }},{{ $json.periodo }},{{ $json.promedio_evaluacion }},{{ $json.porcentaje_evaluacion }},{{ $json.item1 }},{{ $json.item2 }},{{ $json.item3 }},'{{ $json.radar }}','{{ $json.max_min }}','{{ $json.laboral }}','{{ $json.calificaciones }}',{{ $json.comentario_final }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1536,
+        1840
+      ],
+      "id": "21514455-13ea-4c47-9c2d-82d18b84edb8",
+      "name": "Insertar evaluacion final",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0e2e68e1-60f7-4766-9a8d-d4506a245e56",
+              "name": "periodo",
+              "value": "1",
+              "type": "string"
+            },
+            {
+              "id": "6c08929d-1290-49ef-b162-4fceef5a89f9",
+              "name": "item1",
+              "value": "'Item1'",
+              "type": "string"
+            },
+            {
+              "id": "3544aafe-f340-4629-9c6a-3a1570110f7a",
+              "name": "item2",
+              "value": "'Item2'",
+              "type": "string"
+            },
+            {
+              "id": "8fdbf937-9a5f-4225-ae2c-946a686e6802",
+              "name": "item3",
+              "value": "'Item3'",
+              "type": "string"
+            },
+            {
+              "id": "51febd56-dd1d-4e31-8460-13fb8ae72336",
+              "name": "comentario_final",
+              "value": "'Excelente trabajador'",
+              "type": "string"
+            },
+            {
+              "id": "48ee1091-2f0b-4331-917b-911aafdd44d6",
+              "name": "promedio_evaluacion",
+              "value": "={{ $json.promedio }}",
+              "type": "string"
+            },
+            {
+              "id": "b76de222-7338-4a50-b197-df4ad51a2967",
+              "name": "porcentaje_evaluacion",
+              "value": "={{ $json.porcentaje }}",
+              "type": "string"
+            },
+            {
+              "id": "89e47fc4-3c7d-4739-8da4-13165a65d628",
+              "name": "radar",
+              "value": "={{ $('Radar a HTML').item.json.imgRadar_tag }}",
+              "type": "string"
+            },
+            {
+              "id": "b6ef7248-019f-4b2f-8bf5-eb99b3fefed9",
+              "name": "max_min",
+              "value": "={{ $('Barra vertical a HTML').item.json.imgMaxMin_tag }}",
+              "type": "string"
+            },
+            {
+              "id": "1b7bf90f-a700-43da-b67e-54f7c03d07f0",
+              "name": "laboral",
+              "value": "={{ $('Barra horizontal a HTML').item.json.imgLaboral_tag }}",
+              "type": "string"
+            },
+            {
+              "id": "111a4237-18f3-4b93-a508-c98df63ce5bc",
+              "name": "calificaciones",
+              "value": "={{ $('Convertir tabla de estadisticas a HTML').item.json.tabla_html }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1760,
+        1840
+      ],
+      "id": "b10393ca-d68d-4d70-b6c9-5b182cc4bfe9",
+      "name": "Ordenar datos a insertar"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT ROUND(AVG(promedio_general),2) as promedio, ROUND(AVG(promedio_general)/5*100,0) as porcentaje FROM obtener_estadisticas_evaluado(2);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1984,
+        1840
+      ],
+      "id": "1b247b78-0236-426c-88d0-0c50c5cb1b4e",
+      "name": "Consultar  promedio y porcentaje",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM obtener_evaluados_con_info();",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3552,
+        1920
+      ],
+      "id": "bf45d781-5b57-499d-8629-0fe3cc54e7e5",
+      "name": "Listar evaluados",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Rol: \n- Eres un Consultor en Evaluación 360°, necesita analizar resultados de evaluación por cada empleado idenificado con el ID numero [{{ $json.id_evaluado }}] de nombre [{{ $json.nombre_completo }}]. Los datos provienen de una función SQL que se puede obtener de una herramienta \"obtener_estadisticas\" que recibe el ID del empleado y retorna una tabla con:\n\n## Columnas:\n- Competencia: Nombre de la competencia evaluada\n- Puntaje: Promedio numérico (ej: 3.8/5)\n- Porcentaje: Porcentaje del puntaje (ej: 76%)\n- Subordinado: Puntaje promedio dado por un subordinado.\n- Jefe: Puntaje promedio dado por un jefe directo o supervisor.\n- Cliente: Puntaje promedio dado por un cliente interno o externo.\n- Par o Externo: Puntaje promedio dado por un compañero o externo.\n- Auto: Auto-evaluación del empleado.\n\n## Escalas de interpretación: \n- 0%-50%: Nivel BAJO (Área de mejora crítica)\n- 50%-70%: Nivel MEDIO (Área de desarrollo)\n- 70%-100%: Nivel BUENO (Fortaleza)\n\n## Instrucciones para el análisis:\n### Análisis General: \n- Utiliza la herramienta \"obtener_estadisticas\" para conocer la informacion del empleados en su evaluacion, para ello envia o utiliza el ID [{{ $json.id_evaluado }}]. \n- Identifica si el empleado está en nivel BAJO, MEDIO o BUENO globalmente.\n- Menciona cuántas competencias están en cada categoría\n### Análisis por Competencia: \n- Para cada competencia, determina su categoría (Bajo/Medio/Bueno)\n- Contruir una tabla HTML para una mejor visualizacion de los niveles Bajo, Medio y Bueno\n- Destaca las 3 competencias más fuertes (mayor porcentaje)\n- Destaca las 3 competencias que más necesitan mejora (menor porcentaje)\n### Análisis por Tipo de Evaluador: \n- Compara la auto-evaluación vs evaluación de otros. \n- Identifica las mayores brechas entre: Autoevaluacion vs Supervisor, Autoevaluacion vs Pares o Externos, Autoevaluacion vs Subordinados y Autoevaluacion vs Clientes, \n### Recomendaciones Accionables: \n- Para cada competencia en nivel BAJO, sugiere 1 o  2 acciones específicas de mejora. \n- Para competencias en nivel MEDIO, sugiere cómo llevarlas a nivel BUENO.\n- Para competencias en nivel BUENO, sugiere cómo mantenerlas o profundizarlas.\n### Formato de Respuesta: \n- Usa encabezados claros. Incluye tablas resumen cuando sea útil\n- Destaca porcentajes clave en negrita\n- Proporciona insights específicos, no solo descripción de datos\n- Datos de ejemplo (formato tabla):\n\n<table border=\"1\" cellpadding=\"8\" cellspacing=\"0\">\n        <thead>\n            <tr>\n                <th>Competencia</th>\n                <th>Puntaje</th>\n                <th>Porcentaje</th>\n                <th>Subordinado</th>\n                <th>Supervisor</th>\n                <th>Cliente</th>\n                <th>Par</th>\n                <th>Auto</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr>\n                <td>Liderazgo</td>\n                <td>3.2</td>\n                <td>64%</td>\n                <td>3.0</td>\n                <td>3.5</td>\n                <td>3.1</td>\n                <td>3.3</td>\n                <td>4.0</td>\n            </tr>\n            <tr>\n                <td>Comunicación</td>\n                <td>4.1</td>\n                <td>82%</td>\n                <td>4.2</td>\n                <td>4.0</td>\n                <td>4.3</td>\n                <td>4.1</td>\n                <td>3.8</td>\n            </tr>\n            <tr>\n                <td>Trabajo en equipo</td>\n                <td>2.8</td>\n                <td>56%</td>\n                <td>2.5</td>\n                <td>3.0</td>\n                <td>2.7</td>\n                <td>2.9</td>\n                <td>3.5</td>\n            </tr>\n        </tbody>\n    </table>\n\n- La tabla debe ir siempre en su sección, no antes, ni despues, no al inicio ni al final.\n\n### Objetivo final: \n- Generar un reporte ejecutivo que sirva para:\n    * Sesión de feedback con el empleado\n    * Plan de desarrollo individual\n    * Toma de decisiones de promoción/desarrollo\n- Nota: Los porcentajes se calculan sobre una escala de 5 puntos (donde 5 = 100%)\".",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -2832,
+        768
+      ],
+      "id": "bc6a238d-b79b-44af-baf4-e837aa6eefe2",
+      "name": " Consultor en Evaluación 360"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -2880,
+        992
+      ],
+      "id": "5f4419c3-e8ca-4418-9f8b-b0450c17cb2b",
+      "name": "Modelo OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "kAFHdHtrT8l1vfXJ",
+          "name": "AutomatizacionesTendencias"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "3v4lu4c10n",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2752,
+        992
+      ],
+      "id": "187b6c82-897c-473b-a8e5-8287975571f2",
+      "name": "Memoria"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM obtener_estadisticas_evaluacion_simple({{ $json.id_evaluado }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        -2624,
+        992
+      ],
+      "id": "edcaabaa-385f-4217-aac5-95a848900f00",
+      "name": "obtener_estadisticas",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output }}",
+        "destinationKey": "html",
+        "options": {
+          "completeHTMLDocument": true,
+          "tablesHeaderId": true
+        }
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        -2416,
+        768
+      ],
+      "id": "f7dcbf00-cf99-4714-b3e9-b2fb22cbe4c1",
+      "name": "Formatear a Markdown"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL actualizar_resumen_ejecutivo({{ $('Ordenar datos del evaluado1').item.json.id_evaluado }},'{{ $json.html }}');\nSELECT * FROM obtener_datos_empleado(2);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2192,
+        768
+      ],
+      "id": "8a19cfe8-1f9a-4cf6-8654-4e8767733856",
+      "name": "Actualizar y obtener datos empleados",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM fn_wrapper_obtener_datos(2);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1968,
+        768
+      ],
+      "id": "c1790a2c-631d-4604-8945-e3af6bf5e86c",
+      "name": "Obtener informacion de evaluacion",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Reporte de Desempeño</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            line-height: 1.6;\n            color: #333;\n            margin: 20px;\n            background-color: #f4f7f6;\n        }\n\n        .container {\n            max-width: 1000px;\n            margin: 0 auto;\n            background: #fff;\n            padding: 30px;\n            border-radius: 8px;\n            box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n        }\n\n        /* Bloque Superior */\n        .header-block {\n            text-align: center;\n            border-bottom: 2px solid #eee;\n            padding-bottom: 20px;\n            margin-bottom: 30px;\n        }\n        .header-block h1 { margin: 0; font-size: 24px; color: #2c3e50; }\n        .header-block h2 { margin: 5px 0; font-size: 18px; color: #7f8c8d; font-weight: normal; }\n        .header-block h3 { margin: 5px 0; font-size: 16px; color: #95a5a6; font-weight: normal; }\n\n        /* Bloques Medios (Radar y Max-Min) */\n        .charts-row {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 20px;\n            margin-bottom: 30px;\n        }\n\n        .chart-box {\n            border: 1px solid #e0e0e0;\n            padding: 15px;\n            border-radius: 5px;\n            min-height: 300px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            background-color: #fafafa;\n        }\n\n        /* Bloque Laboral (Ancho completo) */\n        .full-width-chart {\n            margin-bottom: 30px;\n            border: 1px solid #e0e0e0;\n            padding: 15px;\n            border-radius: 5px;\n            min-height: 250px;\n            background-color: #fafafa;\n        }\n\n        /* Bloque Tabla */\n        .table-container {\n            overflow-x: auto;\n        }\n        table {\n            width: 100%;\n            border-collapse: collapse;\n            margin-top: 10px;\n        }\n        table th, table td {\n            border: 1px solid #ddd;\n            padding: 12px;\n            text-align: left;\n        }\n        table th {\n            background-color: #2c3e50;\n            color: white;\n        }\n\n        /* Ajuste para móviles */\n        @media (max-width: 768px) {\n            .charts-row {\n                grid-template-columns: 1fr;\n            }\n        }\n    </style>\n</head>\n<body>\n\n  <p>\n    El presente informe de evaluación 360° sintetiza el desempeño integral del colaborador: <strong>{{ $('Actualizar y obtener datos empleados').item.json.nombres_apellidos }}</strong>, destacando sus fortalezas clave y áreas de oportunidad identificadas a través de una valoración multidimensional que incluye perspectivas de supervisores, pares, subordinados y autoevaluación.\n  </p>\n  <br>\n  \n  {{ $json.resumen }}\n\n  <hr />\n\n  <div class=\"header\">\n            <h1>📊 Resultados de la evaluación 360°</h1>\n        </div>\n\n  <p>\n    La evaluación 360° revela un panorama integral del desempeño profesional, identificando fortalezas destacadas y áreas específicas para el desarrollo continuo del colaborador.\n  </p>\n  <br>\n\n<div class=\"container\">\n    \n    <header class=\"header-block\">\n        <div id=\"nombres_apellidos\"><h1>{{ $('Actualizar y obtener datos empleados').item.json.nombres_apellidos }}</h1></div>\n        <div id=\"cargo\"><h2>{{ $('Actualizar y obtener datos empleados').item.json.cargo }}</h2></div>\n        <div id=\"unidad\"><h2>{{ $('Actualizar y obtener datos empleados').item.json.unidad }}</h2></div>\n    </header>\n\n<div class=\"charts-row\" style=\"display: flex; gap: 20px; width: 100%; justify-content: space-between; margin-bottom: 30px;\">\n    \n   <div id=\"grafica_radar\" class=\"chart-box\" style=\"\n    flex: 1; \n    border: 1px solid #e0e0e0; \n    padding: 15px; \n    border-radius: 5px; \n    background-color: #fafafa; \n    display: flex; \n    flex-direction: column; \n    align-items: center; \n    justify-content: center;\n    text-align: center;\n\">\n    <p style=\"margin-bottom: 15px; font-weight: bold; font-size: 12px;\">\n        Perfil de Competencias Laborales\n    </p>\n    <div style=\"display: flex; justify-content: center; width: 100%;\">\n       {{ $json.radar }}\n    </div>\n</div>\n\n<div id=\"grafica_max_min\" class=\"chart-box\" style=\"\n    flex: 1; \n    border: 1px solid #e0e0e0; \n    padding: 15px; \n    border-radius: 5px; \n    background-color: #fafafa; \n    display: flex; \n    flex-direction: column; \n    align-items: center; \n    justify-content: center;\n    text-align: center;\n\">\n    <p style=\"margin-bottom: 15px; font-weight: bold; font-size: 12px;\">\n        Balance de Fortalezas y Áreas de Mejora\n    </p>\n    <div style=\"display: flex; justify-content: center; width: 100%;\">\n        {{ $json.max_min }}\n    </div>\n</div>\n    \n</div>\n\n    <div id=\"grafica_laboral\" class=\"full-width-chart\" style=\"\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    text-align: center;\n    padding: 20px;\n\">\n    <p style=\"\n        font-size: 12px;\n        font-weight: bold;\n        margin-bottom: 30px;\n        width: 100%;\n    \">\n        Percepción del Entorno Laboral\n    </p>\n    <div style=\"\n        display: flex;\n        justify-content: center;\n        align-items: center;\n        width: 100%;\n    \">\n       {{ $json.laboral }}\n    </div>\n</div>\n\n    <div id=\"tabla_html\" class=\"table-container\">\n      {{ $json.tabla }}\n    </div>\n\n</div>\n\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -1744,
+        768
+      ],
+      "id": "c7b3542b-62a6-4744-a390-f89391e81080",
+      "name": "Construir plantilla del correo"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM fn_wrapper_obtener_datos({{ $('Correo y evaluado').item.json.id_empleado }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3056,
+        -144
+      ],
+      "id": "71dfe346-5476-4c86-888e-f313694d09c9",
+      "name": "Obtener informacion de evaluacion1",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Reporte de Desempeño</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            line-height: 1.6;\n            color: #333;\n            margin: 20px;\n            background-color: #f4f7f6;\n        }\n\n        .container {\n            max-width: 1000px;\n            margin: 0 auto;\n            background: #fff;\n            padding: 30px;\n            border-radius: 8px;\n            box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n        }\n\n        /* Bloque Superior */\n        .header-block {\n            text-align: center;\n            border-bottom: 2px solid #eee;\n            padding-bottom: 20px;\n            margin-bottom: 30px;\n        }\n        .header-block h1 { margin: 0; font-size: 24px; color: #2c3e50; }\n        .header-block h2 { margin: 5px 0; font-size: 18px; color: #7f8c8d; font-weight: normal; }\n        .header-block h3 { margin: 5px 0; font-size: 16px; color: #95a5a6; font-weight: normal; }\n\n        /* Bloques Medios (Radar y Max-Min) */\n        .charts-row {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 20px;\n            margin-bottom: 30px;\n        }\n\n        .chart-box {\n            border: 1px solid #e0e0e0;\n            padding: 15px;\n            border-radius: 5px;\n            min-height: 300px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            background-color: #fafafa;\n        }\n\n        /* Bloque Laboral (Ancho completo) */\n        .full-width-chart {\n            margin-bottom: 30px;\n            border: 1px solid #e0e0e0;\n            padding: 15px;\n            border-radius: 5px;\n            min-height: 250px;\n            background-color: #fafafa;\n        }\n\n        /* Bloque Tabla */\n        .table-container {\n            overflow-x: auto;\n        }\n        table {\n            width: 100%;\n            border-collapse: collapse;\n            margin-top: 10px;\n        }\n        table th, table td {\n            border: 1px solid #ddd;\n            padding: 12px;\n            text-align: left;\n        }\n        table th {\n            background-color: #2c3e50;\n            color: white;\n        }\n\n        /* Ajuste para móviles */\n        @media (max-width: 768px) {\n            .charts-row {\n                grid-template-columns: 1fr;\n            }\n        }\n    </style>\n</head>\n<body>\n\n  <p>\n    El presente informe de evaluación 360° sintetiza el desempeño integral del colaborador: <strong>{{ $('Actualizar y obtener datos empleados1').item.json.nombres_apellidos }}</strong>, destacando sus fortalezas clave y áreas de oportunidad identificadas a través de una valoración multidimensional que incluye perspectivas de supervisores, pares, subordinados y autoevaluación.\n  </p>\n  <br>\n  \n  {{ $json.resumen }}\n\n  <hr />\n\n  <div class=\"header\">\n            <h1>📊 Resultados de la evaluación 360°</h1>\n        </div>\n\n  <p>\n    La evaluación 360° revela un panorama integral del desempeño profesional, identificando fortalezas destacadas y áreas específicas para el desarrollo continuo del colaborador.\n  </p>\n  <br>\n\n<div class=\"container\">\n    \n    <header class=\"header-block\">\n        <div id=\"nombres_apellidos\"><h1>{{ $('Actualizar y obtener datos empleados1').item.json.nombres_apellidos }}</h1></div>\n        <div id=\"cargo\"><h2>{{ $('Actualizar y obtener datos empleados1').item.json.cargo }}</h2></div>\n        <div id=\"unidad\"><h2>{{ $('Actualizar y obtener datos empleados1').item.json.unidad_nombre }}</h2></div>\n    </header>\n\n<div class=\"charts-row\" style=\"display: flex; gap: 20px; width: 100%; justify-content: space-between; margin-bottom: 30px;\">\n    \n   <div id=\"grafica_radar\" class=\"chart-box\" style=\"\n    flex: 1; \n    border: 1px solid #e0e0e0; \n    padding: 15px; \n    border-radius: 5px; \n    background-color: #fafafa; \n    display: flex; \n    flex-direction: column; \n    align-items: center; \n    justify-content: center;\n    text-align: center;\n\">\n    <p style=\"margin-bottom: 15px; font-weight: bold; font-size: 12px;\">\n        Perfil de Competencias Laborales\n    </p>\n    <div style=\"display: flex; justify-content: center; width: 100%;\">\n       {{ $json.radar }}\n    </div>\n</div>\n\n<div id=\"grafica_max_min\" class=\"chart-box\" style=\"\n    flex: 1; \n    border: 1px solid #e0e0e0; \n    padding: 15px; \n    border-radius: 5px; \n    background-color: #fafafa; \n    display: flex; \n    flex-direction: column; \n    align-items: center; \n    justify-content: center;\n    text-align: center;\n\">\n    <p style=\"margin-bottom: 15px; font-weight: bold; font-size: 12px;\">\n        Balance de Fortalezas y Áreas de Mejora\n    </p>\n    <div style=\"display: flex; justify-content: center; width: 100%;\">\n        {{ $json.max_min }}\n    </div>\n</div>\n    \n</div>\n\n    <div id=\"grafica_laboral\" class=\"full-width-chart\" style=\"\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    text-align: center;\n    padding: 20px;\n\">\n    <p style=\"\n        font-size: 12px;\n        font-weight: bold;\n        margin-bottom: 30px;\n        width: 100%;\n    \">\n        Percepción del Entorno Laboral\n    </p>\n    <div style=\"\n        display: flex;\n        justify-content: center;\n        align-items: center;\n        width: 100%;\n    \">\n       {{ $json.laboral }}\n    </div>\n</div>\n\n    <div id=\"tabla_html\" class=\"table-container\">\n      {{ $json.tabla }}\n    </div>\n\n</div>\n<footer style=\"\n    background-color: #f8f9fa;\n    border-top: 1px solid #e9ecef;\n    padding: 20px;\n    text-align: center;\n    font-family: Arial, sans-serif;\n    color: #6c757d;\n    margin-top: 40px;\n\">\n    <div style=\"max-width: 800px; margin: 0 auto;\">\n        <p style=\"margin: 0 0 5px 0; font-size: 14px;\">\n            <strong style=\"color: #495057;\">Evaluación de Desempeño 360° Automatizado</strong>\n        </p>\n        <p style=\"margin: 0; font-size: 13px;\">\n            &copy; 2026 Grupo Tendencias\n        </p>\n        <p style=\"margin: 5px 0 0 0; font-size: 12px; color: #adb5bd;\">\n            Sistema de gestión del desempeño profesional\n        </p>\n    </div>\n</footer>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -2832,
+        -144
+      ],
+      "id": "7a94f6aa-e979-4687-a6ee-96c890b363a6",
+      "name": "Construir plantilla del correo1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Correo y evaluado').item.json.auditor }},{{ $('Correo y evaluado').item.json.admin }},{{ $('Correo y evaluado').item.json.auto }}",
+        "subject": "=Evaluacion de: {{ $('Actualizar y obtener datos empleados1').item.json.nombres_apellidos }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Evaluaciones RRHH"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -2608,
+        -144
+      ],
+      "id": "f68fd260-96be-47d0-a98e-fd870fbd35d2",
+      "name": "Enviar resultado1",
+      "webhookId": "53fadb9e-a7d0-4c8c-83c7-1759b991b3bf",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Saxpv5XhICgg6uw2",
+          "name": "Correo de Automatización"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM obtener_datos_empleado(2);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3280,
+        -144
+      ],
+      "id": "2c69eb18-aa90-4a63-a741-4eb22ddb8bae",
+      "name": "Actualizar y obtener datos empleados1",
+      "credentials": {
+        "postgres": {
+          "id": "WmA1SsJ0bG6hpR6a",
+          "name": "PostgreSQL - Evaluacion360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ea21a2c-e947-47ac-acbf-371d451901e7",
+              "name": "id_empleado",
+              "value": "2",
+              "type": "string"
+            },
+            {
+              "id": "41e4c8c1-4c12-412a-8152-4010b42c1e72",
+              "name": "auditor",
+              "value": "auditordeprocesos@grupotendenciasab.com",
+              "type": "string"
+            },
+            {
+              "id": "aa6c0efd-1ce6-487c-b13a-968d2fbc5134",
+              "name": "admin",
+              "value": "Adthnominaybeneficios@grupotendenciasab.com",
+              "type": "string"
+            },
+            {
+              "id": "3f89b17d-f7e5-4c30-8d35-9d6948923a77",
+              "name": "auto",
+              "value": "automatizacionestendencias@gmail.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3504,
+        -144
+      ],
+      "id": "86e7a5a9-84bd-4681-8d0c-f257d77a24ff",
+      "name": "Correo y evaluado"
+    },
+    {
+      "parameters": {
+        "content": "## Paso 6. Enviar reporte por correo",
+        "height": 816,
+        "width": 928,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4688,
+        -480
+      ],
+      "id": "91439257-1a12-4c42-9089-572f06d41b5e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -4336,
+        4784
+      ],
+      "id": "4d152126-f99b-4e4f-968f-931b0a5eeae2",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Procesar evaluacion": {
+      "main": [
+        [
+          {
+            "node": "Calcular y actualizar totales",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar id relacion y competencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar id relacion y competencia": {
+      "main": [
+        [
+          {
+            "node": "Preparar valores para insertar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar valores para insertar": {
+      "main": [
+        [
+          {
+            "node": "Buscar registro de calificacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar registro de calificacion": {
+      "main": [
+        [
+          {
+            "node": "¿ No existe registro ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿ No existe registro ?": {
+      "main": [
+        [
+          {
+            "node": "Insertar registro de evaluacion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Procesar evaluacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insertar registro de evaluacion": {
+      "main": [
+        [
+          {
+            "node": "Siguiente evaluacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siguiente evaluacion": {
+      "main": [
+        [
+          {
+            "node": "Procesar evaluacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar fecha": {
+      "main": [
+        [
+          {
+            "node": "Formatear fecha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear fecha": {
+      "main": [
+        [
+          {
+            "node": "Seleccionar atributos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar atributos": {
+      "main": [
+        [
+          {
+            "node": "Obtener relacion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar evaluado",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar evaluador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar id_relacion y descripcion": {
+      "main": [
+        [
+          {
+            "node": "Agrupar datos de relacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar evaluado": {
+      "main": [
+        [
+          {
+            "node": "Agrupar evaluado y evaluador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar evaluador": {
+      "main": [
+        [
+          {
+            "node": "Agrupar evaluado y evaluador",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Agrupar evaluado y evaluador": {
+      "main": [
+        [
+          {
+            "node": "Agrupar datos de relacion",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Agrupar datos de relacion": {
+      "main": [
+        [
+          {
+            "node": "Buscar relacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar relacion": {
+      "main": [
+        [
+          {
+            "node": "¿ No existe relacion ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿ No existe relacion ?": {
+      "main": [
+        [
+          {
+            "node": "Insertar registro de relacion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Siguiente relacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insertar registro de relacion": {
+      "main": [
+        [
+          {
+            "node": "Siguiente relacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siguiente relacion": {
+      "main": [
+        [
+          {
+            "node": "Procesar configuracion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar fecha de ingreso": {
+      "main": [
+        [
+          {
+            "node": "Formatear fecha de ingreso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear fecha de ingreso": {
+      "main": [
+        [
+          {
+            "node": "Seleccionar atributos de empleados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar atributos de empleados": {
+      "main": [
+        [
+          {
+            "node": "Buscar empleado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar empleado": {
+      "main": [
+        [
+          {
+            "node": "¿ No Existe empleado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener grafica radar": {
+      "main": [
+        [
+          {
+            "node": "Radar a HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener grafica max y min": {
+      "main": [
+        [
+          {
+            "node": "Barra vertical a HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar reporte del evaluado": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Obtener resultados de evaluacion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Obtener estadisticas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Obtener valor minimo y maimo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Obtener porcentajes por competencias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener resultados de evaluacion": {
+      "main": [
+        [
+          {
+            "node": "Parametros de grafica radar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener valor minimo y maimo": {
+      "main": [
+        [
+          {
+            "node": "Parametros Barra vertical",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parametros de grafica radar": {
+      "main": [
+        [
+          {
+            "node": "Obtener grafica radar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Radar a HTML": {
+      "main": [
+        [
+          {
+            "node": "Consolidar objeto de la plantilla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parametros Barra vertical": {
+      "main": [
+        [
+          {
+            "node": "Obtener grafica max y min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener porcentajes por competencias": {
+      "main": [
+        [
+          {
+            "node": "Parametros Barra horizonal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parametros Barra horizonal": {
+      "main": [
+        [
+          {
+            "node": "Obtener grafica horizontal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener grafica horizontal": {
+      "main": [
+        [
+          {
+            "node": "Barra horizontal a HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Barra vertical a HTML": {
+      "main": [
+        [
+          {
+            "node": "Consolidar objeto de la plantilla",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Barra horizontal a HTML": {
+      "main": [
+        [
+          {
+            "node": "Consolidar objeto de la plantilla",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Obtener estadisticas": {
+      "main": [
+        [
+          {
+            "node": "Convertir tabla de estadisticas a HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convertir tabla de estadisticas a HTML": {
+      "main": [
+        [
+          {
+            "node": "Consolidar objeto de la plantilla",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Consolidar objeto de la plantilla": {
+      "main": [
+        [
+          {
+            "node": "Consultar  promedio y porcentaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siguiente empleado1": {
+      "main": [
+        [
+          {
+            "node": "Procesar reporte del evaluado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener ids de evaluados1": {
+      "main": [
+        [
+          {
+            "node": "Procesar evaluados1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar evaluados1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Ordenar datos del evaluado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ordenar datos del evaluado1": {
+      "main": [
+        [
+          {
+            "node": " Consultor en Evaluación 360",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siguiente empleado2": {
+      "main": [
+        [
+          {
+            "node": "Procesar evaluados1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar empleados": {
+      "main": [
+        [
+          {
+            "node": "Metadato - estado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Seleccionar fecha de ingreso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lista de empleados": {
+      "main": [
+        [
+          {
+            "node": "Procesar empleados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿ No Existe empleado?": {
+      "main": [
+        [
+          {
+            "node": "Agregamos empleado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Siguiente empleado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregamos empleado": {
+      "main": [
+        [
+          {
+            "node": "Siguiente empleado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siguiente empleado": {
+      "main": [
+        [
+          {
+            "node": "Procesar empleados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar configuracion": {
+      "main": [
+        [
+          {
+            "node": "Metadato - estado2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Seleccionar fecha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lista de configuraciones": {
+      "main": [
+        [
+          {
+            "node": "Procesar configuracion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener relacion": {
+      "main": [
+        [
+          {
+            "node": "Seleccionar id_relacion y descripcion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar evaluado": {
+      "main": [
+        [
+          {
+            "node": "Seleccionar evaluado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar evaluador": {
+      "main": [
+        [
+          {
+            "node": "Seleccionar evaluador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer evaluaciones": {
+      "main": [
+        [
+          {
+            "node": "Procesar evaluacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insertar evaluacion final": {
+      "main": [
+        [
+          {
+            "node": "Siguiente empleado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ordenar datos a insertar": {
+      "main": [
+        [
+          {
+            "node": "Insertar evaluacion final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar  promedio y porcentaje": {
+      "main": [
+        [
+          {
+            "node": "Ordenar datos a insertar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar evaluados": {
+      "main": [
+        [
+          {
+            "node": "Procesar reporte del evaluado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    " Consultor en Evaluación 360": {
+      "main": [
+        [
+          {
+            "node": "Formatear a Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": " Consultor en Evaluación 360",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria": {
+      "ai_memory": [
+        [
+          {
+            "node": " Consultor en Evaluación 360",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener_estadisticas": {
+      "ai_tool": [
+        [
+          {
+            "node": " Consultor en Evaluación 360",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear a Markdown": {
+      "main": [
+        [
+          {
+            "node": "Actualizar y obtener datos empleados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar y obtener datos empleados": {
+      "main": [
+        [
+          {
+            "node": "Obtener informacion de evaluacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener informacion de evaluacion": {
+      "main": [
+        [
+          {
+            "node": "Construir plantilla del correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir plantilla del correo": {
+      "main": [
+        [
+          {
+            "node": "Siguiente empleado2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener informacion de evaluacion1": {
+      "main": [
+        [
+          {
+            "node": "Construir plantilla del correo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir plantilla del correo1": {
+      "main": [
+        [
+          {
+            "node": "Enviar resultado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar y obtener datos empleados1": {
+      "main": [
+        [
+          {
+            "node": "Obtener informacion de evaluacion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correo y evaluado": {
+      "main": [
+        [
+          {
+            "node": "Actualizar y obtener datos empleados1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d27e8d34-8479-48e3-8559-065622c2720d",
+  "meta": {
+    "instanceId": "f01fdce172c199b86bd72c34f38a516a7680d2acb32e6a2517a83199b1dbf844"
+  },
+  "id": "tIofYxFtQHFTpXTF",
+  "tags": []
+}
