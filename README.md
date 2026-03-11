@@ -18,7 +18,7 @@
 Este proceso automatizado con un agente de IA como Consultor 360 resuelve el sesgo subjetivo que suelen presentarse en las evaluaciones de desempeño tradicionales. Al actuar como un consultor experto, el agente integra y analiza volúmenes de datos, eliminando la carga administrativa de tabular respuestas manualmente, permitiendo una entrega de resultados inmediata y estandarizada. Así, se garantiza que cada colaborador reciba una retroalimentación justa, técnica y profundamente alineada con los objetivos estratégicos de la organización.
 
 ## Stack Tecnológico
-- **Orquestador**: n8n (1.123.22).
+- **Orquestador**: n8n (versión 1.123.22).
 - **Backend & Carga de Datos**: Laravel (utilizando plantillas Blade para la estandarización).
 - **Fuente de Entrada**: Google Sheets (como interfaz de gestión administrativa).
 - **Base de Datos Relacional**: PostgreSQL (donde se consolidan y estructuran los datos de evaluación tras el flujo de sincronización).
@@ -46,7 +46,6 @@ Este sistema implementa una arquitectura RAG basada en datos estructurados que s
 ## Workflow
 
 [Descargar el Workflow de Evaluación 360](https://raw.githubusercontent.com/ing-jhparra/Agente-IA-360/refs/heads/main/scripts/Evaluacion%20360.json)
-
 
 ## 1. Carga de Empleados
 
