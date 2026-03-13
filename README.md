@@ -156,6 +156,18 @@ Aquí tienes un resumen de los componentes principales:
 
 ## Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos
 
+Esta tabla representa el diccionario de funciones y procedimientos almacenados que conectan tus flujos de n8n con la base de datos PostgreSQL. Es la capa de lógica que permite que los nodos de "Execute Query" realicen acciones específicas de forma estandarizada.
+
+Podemos agrupar estas funciones según su propósito dentro del proceso automatizado:
+
+  - **Consultas de Identificación (SELECT)**: Utilizadas para validar la existencia de registros o recuperar IDs específicos de relaciones, competencias y empleados (ej. buscar_id_area_competencia).
+  - **Gestión de Evaluaciones y Resultados**: Funciones clave para extraer métricas cualitativas y cuantitativas, como los valores máximos/mínimos y los porcentajes por competencia que alimentan tus gráficas.
+  - **Acciones de Escritura y Procesamiento (CALL)**: Procedimientos encargados de la carga física de datos y el cálculo de métricas agregadas (ej. actualizar_promedios_totales).
+  - **Integración de Datos de Empleado**: Funciones que mantienen actualizada la información del personal y recuperan los datos finales para la construcción de los correos de notificación.
+
+Esta arquitectura desacopla la lógica de negocio de la herramienta de automatización, facilitando que cualquier cambio en las reglas de evaluación se ajuste directamente en la base de datos sin necesidad de modificar todos los flujos.
+
+
 | Nodo                                   | Tipo   | Procedimiento / Función                  |
 |----------------------------------------|--------|------------------------------------------|
 | Buscar id relación y competencia       | SELECT | buscar_id_relacion_evaluacion            |
