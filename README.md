@@ -232,6 +232,9 @@ Para visualizar el resultado de este proceso, pongo a su disposición los archiv
 
 - [Descargar Calificaciones de Evaluados.xlsx](https://github.com/ing-jhparra/Agente-IA-360/blob/605c47d8a21eda85975220625acc06150eda0e96/formularios/Lista%20de%20Empleados.xlsx)
 
+De igual manera pongo a su disposición las plantillas Blade generada y optimizadas mediante IA. Estas plantillas están diseñadas para facilitar el llenado de las hojas de Google Sheet.
+
+- [Descargar Plantillas](https://github.com/ing-jhparra/Agente-IA-360/blob/d699e6fbb05793c4cb078ed4608f4a4aeddda14f/laravel/resources.rar)
 
 ## Producto Final
 
