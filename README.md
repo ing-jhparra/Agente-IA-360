@@ -16,6 +16,7 @@
 * [Workflow](#workflow)
 * [Diagrama Entidad Relación](#diagrama-entidad-relación)
 * [Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos](#procedimientos-almacenados-y-funciones-plsql-utilizados-en-los-nodos)
+* [Plantillas Blade](#plantilla-blade)
 * [Producto Final](#producto-final)
 
 ## Descripción 
@@ -187,6 +188,40 @@ Esta arquitectura desacopla la lógica de negocio de la herramienta de automatiz
 | Información evaluación                 | SELECT | obtener_datos_evaluacion_empleado        |
 | Actualizar y obtener datos empleado    | SELECT | actualizar_y_obtener_datos_empleado      |
 
+
+## Plantillas Blade
+
+Aunque inicialmente el proyecto se concibió utilizando Google Sheets como fuente de datos, decidimos evolucionar hacia una arquitectura más robusta basada en PostgreSQL. Esta transición no solo garantiza una mayor integridad y escalabilidad en el tratamiento de la información, sino que permite explotar todo el potencial de n8n. En lugar de realizar inserciones directas en tablas, optamos por orquestar el flujo completo a través de n8n para validar sus capacidades de automatización avanzada y gestión de procesos complejos.
+
+Para elevar el nivel técnico y estético del proyecto, integramos plantillas Blade de Laravel en lugar de las opciones nativas de n8n. Esta decisión estratégica permitió desacoplar la lógica de presentación, facilitando una estructuración de datos mucho más limpia y profesional antes de ser enviada a las hojas de Google Sheets.
+
+<div align="center">
+  <h1 align="center">
+      <br />
+      <img src="./img/plantilla1.png" alt="Siniestros Viales">
+      <br />
+  </h1>
+</div>
+
+El sistema cuenta con un formulario especializado que gestiona la creación de la relación Evaluado-Evaluador. En esta etapa, se define el rol jerárquico del proceso (Supervisor, Compañero, Subordinado o Cliente), enviando automáticamente los datos estructurados hacia una hoja de Google Sheets para su posterior procesamiento y análisis.
+
+<div align="center">
+  <h1 align="center">
+      <br />
+      <img src="./img/plantilla2.png" alt="Siniestros Viales">
+      <br />
+  </h1>
+</div>
+
+Siguiendo la misma lógica, el proceso de calificación se gestiona a través de un formulario optimizado que facilita el registro de las evaluaciones. Los datos recolectados se sincronizan en tiempo real con la hoja de Google Sheets, asegurando que cada calificación quede centralizada y lista para ser procesada.
+
+<div align="center">
+  <h1 align="center">
+      <br />
+      <img src="./img/plantilla3.png" alt="Siniestros Viales">
+      <br />
+  </h1>
+</div>
 
 ## Producto Final
 
