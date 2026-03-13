@@ -44,6 +44,8 @@ Este sistema implementa una arquitectura RAG basada en datos estructurados que s
 
 ## Workflow
 
+Haz clic en el siguiente enlace para obtener el archivo JSON con la configuración integral del flujo: nodos, integración de agentes de IA y modelos relacionales.
+
 [Descargar el Workflow de Evaluación 360](https://raw.githubusercontent.com/ing-jhparra/Agente-IA-360/refs/heads/main/scripts/Evaluacion%20360.json)
 
 ## 1. Carga de Empleados
