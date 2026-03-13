@@ -223,6 +223,13 @@ Siguiendo la misma lógica, el proceso de calificación se gestiona a través de
   </h1>
 </div>
 
+Para visualizar el resultado de este proceso, pongo a su disposición los archivos con datos de ejemplo. Estos documentos reflejan la estructura final de la información tras haber sido procesada por los formularios de relación y calificación descritos anteriormente.
+
+Descargar Lista de Empleados.xlsx
+Descargar Configuracion de Relaciones.xlsx
+Descargar Calificaciones de Evaluados.xlsx
+
+
 ## Producto Final
 
 El proceso cierra el ciclo de talento enviando un correo al supervisor inmediato con los resultados de la evaluación y una propuesta de actividades de crecimiento, transformando los datos en un plan de acción real para el desarrollo del personal.
