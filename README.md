@@ -111,10 +111,8 @@ Este flujo de trabajo implementa un agente de IA para la consultoría de evaluac
 
 Se destaca :
 
-- **Inteligencia Artificial**: Utiliza un nodo de agente ("Consultor en Evaluación 360") conectado a un modelo de OpenAI, con memoria y una herramienta específica para obtener estadísticas de la base de datos, permitiendo generar análisis cualitativos personalizados.
-
+- **Inteligencia Artificial**: Utiliza un nodo de agente **Consultor en Evaluación 360** conectado a un modelo de OpenAI, con memoria y una herramienta específica para obtener estadísticas de la base de datos, permitiendo generar análisis cualitativos personalizados.
 - **Procesamiento de Texto**: Los resultados del análisis de la IA se formatean de Markdown a HTML para asegurar una presentación profesional.
-
 - **Gestión de Información**: El flujo actualiza los datos de los empleados, recupera la información final de la evaluación y construye una plantilla de correo electrónico personalizada para cada trabajador antes de pasar al siguiente registro.
 
 <div align="center">
@@ -145,11 +143,8 @@ Este es el diagrama de entidad-relación que sustenta todo el sistema de evaluac
 Aquí tienes un resumen de los componentes principales:
 
 - **Núcleo de Gestión de Personal**: Las tablas empleado y unidad organizan la estructura organizacional, vinculando a cada trabajador con su departamento y datos de contacto.
-
 - **Configuración de Evaluaciones**: La tabla relacion_evaluacion es el puente crítico; conecta al evaluado con su evaluador, define el tipo_relacion (como jefe, colega o subordinado) y lo enmarca en un periodo_evaluacion específico.
-
 - **Captura de Datos**: La tabla detalle_evaluacion almacena las calificaciones individuales por cada area_competencia, permitiendo un desglose granular de los resultados.
-
 - **Consolidación y Reportes**: 
     - **totales**: Almacena los promedios calculados por área para facilitar la generación de estadísticas.
     - **evaluacion_final**: Es la tabla de salida donde se guardan los promedios globales, porcentajes de cumplimiento y los fragmentos de código (como los campos radar, tabla y resumen_ejecutivo) que vimos generarse en los flujos de automatización anteriores.
