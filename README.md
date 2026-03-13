@@ -11,8 +11,11 @@
 
 * [Descripción](#Descripción})
 * [Stack Tecnológico](#Stack-Tecnológico)
+* [Arquitectura RAG](#Arquitectura-RAG)
+* [Observaciones/Limitaciones](#Observaciones/Limitaciones)
 * [Workflow](#Workflow)
-
+* [Diagrama Entidad Relación](#Diagrama-Entidad-Relación)
+* [Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos](#Procedimientos-Almacenados-y-Funciones-PL/SQL-utilizados-en-los-nodos)
 
 ## Descripción 
 Este proceso automatizado con un agente de IA como Consultor 360 surge para responder a la necesidad de la empresa de encontrar una solución con IA que optimice y ahorre recursos en el proceso de evaluación. Este agente resuelve el sesgo subjetivo que suelen presentarse en las evaluaciones de desempeño tradicionales. Al actuar como un consultor experto, el agente integra y analiza volúmenes de datos, eliminando la carga administrativa de tabular respuestas manualmente, permitiendo una entrega de resultados inmediata y estandarizada. Así, se garantiza que cada colaborador reciba una retroalimentación justa, técnica y profundamente alineada con los objetivos estratégicos de la organización.
@@ -89,9 +92,9 @@ Este flujo de trabajo automatiza la generación de reportes de evaluación detal
 
 Con esta información, el sistema genera dinámicamente varios componentes visuales:
 
-  **Gráficas**: Crea representaciones de tipo radar, barras verticales y horizontales.
-  **Conversión**: Transforma tanto las gráficas como las tablas estadísticas a formato HTML.
-  **Consolidación**: Agrupa todos los elementos en una plantilla de informe única, calcula los promedios finales e inserta el registro de evaluación terminado en la base de datos antes de pasar al siguiente empleado.
+- **Gráficas**: Crea representaciones de tipo radar, barras verticales y horizontales.
+- **Conversión**: Transforma tanto las gráficas como las tablas estadísticas a formato HTML.
+- **Consolidación**: Agrupa todos los elementos en una plantilla de informe única, calcula los promedios finales e inserta el registro de evaluación terminado en la base de datos antes de pasar al siguiente empleado.
 
 <div align="center">
   <h1 align="center">
@@ -108,11 +111,11 @@ Este flujo de trabajo implementa un agente de IA para la consultoría de evaluac
 
 Se destaca :
 
-    **Inteligencia Artificial**: Utiliza un nodo de agente ("Consultor en Evaluación 360") conectado a un modelo de OpenAI, con memoria y una herramienta específica para obtener estadísticas de la base de datos, permitiendo generar análisis cualitativos personalizados.
+- **Inteligencia Artificial**: Utiliza un nodo de agente ("Consultor en Evaluación 360") conectado a un modelo de OpenAI, con memoria y una herramienta específica para obtener estadísticas de la base de datos, permitiendo generar análisis cualitativos personalizados.
 
-    **Procesamiento de Texto**: Los resultados del análisis de la IA se formatean de Markdown a HTML para asegurar una presentación profesional.
+- **Procesamiento de Texto**: Los resultados del análisis de la IA se formatean de Markdown a HTML para asegurar una presentación profesional.
 
-    **Gestión de Información**: El flujo actualiza los datos de los empleados, recupera la información final de la evaluación y construye una plantilla de correo electrónico personalizada para cada trabajador antes de pasar al siguiente registro.
+- **Gestión de Información**: El flujo actualiza los datos de los empleados, recupera la información final de la evaluación y construye una plantilla de correo electrónico personalizada para cada trabajador antes de pasar al siguiente registro.
 
 <div align="center">
   <h1 align="center">
@@ -141,15 +144,15 @@ Este es el diagrama de entidad-relación que sustenta todo el sistema de evaluac
 
 Aquí tienes un resumen de los componentes principales:
 
-    **Núcleo de Gestión de Personal**: Las tablas empleado y unidad organizan la estructura organizacional, vinculando a cada trabajador con su departamento y datos de contacto.
+- **Núcleo de Gestión de Personal**: Las tablas empleado y unidad organizan la estructura organizacional, vinculando a cada trabajador con su departamento y datos de contacto.
 
-    **Configuración de Evaluaciones**: La tabla relacion_evaluacion es el puente crítico; conecta al evaluado con su evaluador, define el tipo_relacion (como jefe, colega o subordinado) y lo enmarca en un periodo_evaluacion específico.
+- **Configuración de Evaluaciones**: La tabla relacion_evaluacion es el puente crítico; conecta al evaluado con su evaluador, define el tipo_relacion (como jefe, colega o subordinado) y lo enmarca en un periodo_evaluacion específico.
 
-    **Captura de Datos**: La tabla detalle_evaluacion almacena las calificaciones individuales por cada area_competencia, permitiendo un desglose granular de los resultados.
+- **Captura de Datos**: La tabla detalle_evaluacion almacena las calificaciones individuales por cada area_competencia, permitiendo un desglose granular de los resultados.
 
-    **Consolidación y Reportes**: 
-          - totales: Almacena los promedios calculados por área para facilitar la generación de estadísticas.
-          - evaluacion_final: Es la tabla de salida donde se guardan los promedios globales, porcentajes de cumplimiento y los fragmentos de código (como los campos radar, tabla y resumen_ejecutivo) que vimos generarse en los flujos de automatización anteriores.
+- **Consolidación y Reportes**: 
+    - **totales**: Almacena los promedios calculados por área para facilitar la generación de estadísticas.
+    - **evaluacion_final**: Es la tabla de salida donde se guardan los promedios globales, porcentajes de cumplimiento y los fragmentos de código (como los campos radar, tabla y resumen_ejecutivo) que vimos generarse en los flujos de automatización anteriores.
 
 <div align="center">
   <h1 align="center">
