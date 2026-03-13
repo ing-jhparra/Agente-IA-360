@@ -226,7 +226,7 @@ Siguiendo la misma lógica, el proceso de calificación se gestiona a través de
 Para visualizar el resultado de este proceso, pongo a su disposición los archivos con datos de ejemplo. Estos documentos reflejan la estructura final de la información tras haber sido procesada por los formularios de relación y calificación descritos anteriormente.
 
 
-- [Descargar Lista de Empleados.xlsx](https://github.com/ing-jhparra/Agente-IA-360/blob/605c47d8a21eda85975220625acc06150eda0e96/formularios/Calificaciones%20de%20Evaluados.xlsx)
+- [Descargar Lista de Empleados.xlsx](https://github.com/ing-jhparra/Agente-IA-360/raw/refs/heads/main/formularios/Calificaciones%20de%20Evaluados.xlsx)
 
 - [Descargar Configuracion de Relaciones.xlsx](https://github.com/ing-jhparra/Agente-IA-360/blob/605c47d8a21eda85975220625acc06150eda0e96/formularios/Configuracion%20de%20Relaciones.xlsx)
 
