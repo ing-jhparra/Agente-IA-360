@@ -16,6 +16,7 @@
 * [Workflow](#workflow)
 * [Diagrama Entidad Relación](#diagrama-entidad-relación)
 * [Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos](#procedimientos-almacenados-y-funciones-plsql-utilizados-en-los-nodos)
+* [Producto Final](#producto-final)
 
 ## Descripción 
 Este proceso automatizado con un agente de IA como Consultor 360 surge para responder a la necesidad de la empresa de encontrar una solución con IA que optimice y ahorre recursos en el proceso de evaluación. Este agente resuelve el sesgo subjetivo que suelen presentarse en las evaluaciones de desempeño tradicionales. Al actuar como un consultor experto, el agente integra y analiza volúmenes de datos, eliminando la carga administrativa de tabular respuestas manualmente, permitiendo una entrega de resultados inmediata y estandarizada. Así, se garantiza que cada colaborador reciba una retroalimentación justa, técnica y profundamente alineada con los objetivos estratégicos de la organización.
@@ -185,6 +186,35 @@ Esta arquitectura desacopla la lógica de negocio de la herramienta de automatiz
 | Porcentajes por competencias           | SELECT | obtener_estadisticas_evaluado            |
 | Información evaluación                 | SELECT | obtener_datos_evaluacion_empleado        |
 | Actualizar y obtener datos empleado    | SELECT | actualizar_y_obtener_datos_empleado      |
+
+
+## Producto Final
+
+El proceso cierra el ciclo de talento enviando un correo al supervisor inmediato con los resultados de la evaluación y una propuesta de actividades de crecimiento, transformando los datos en un plan de acción real para el desarrollo del personal.
+
+<div align="center">
+  <h1 align="center">
+      <br />
+      <img src="./img/correo1.png" alt="Siniestros Viales">
+      <br />
+  </h1>
+</div>
+
+<div align="center">
+  <h1 align="center">
+      <br />
+      <img src="./img/correo2.png" alt="Siniestros Viales">
+      <br />
+  </h1>
+</div>
+
+<div align="center">
+  <h1 align="center">
+      <br />
+      <img src="./img/correo3.png" alt="Siniestros Viales">
+      <br />
+  </h1>
+</div>
 
 ## Autor
 
