@@ -12,10 +12,10 @@
 * [Descripción](#Descripción})
 * [Stack Tecnológico](#Stack-Tecnológico)
 * [Arquitectura RAG](#Arquitectura-RAG)
-* [Observaciones/Limitaciones](#Observaciones/Limitaciones)
+* [Observaciones/Limitaciones](#observaciones-limitaciones)
 * [Workflow](#Workflow)
 * [Diagrama Entidad Relación](#Diagrama-Entidad-Relación)
-* [Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos](#Procedimientos-Almacenados-y-Funciones-PL/SQL-utilizados-en-los-nodos)
+* [Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos](#procedimientos-almacenados-y-funciones-plsql-utilizados-en-los-nodos)
 
 ## Descripción 
 Este proceso automatizado con un agente de IA como Consultor 360 surge para responder a la necesidad de la empresa de encontrar una solución con IA que optimice y ahorre recursos en el proceso de evaluación. Este agente resuelve el sesgo subjetivo que suelen presentarse en las evaluaciones de desempeño tradicionales. Al actuar como un consultor experto, el agente integra y analiza volúmenes de datos, eliminando la carga administrativa de tabular respuestas manualmente, permitiendo una entrega de resultados inmediata y estandarizada. Así, se garantiza que cada colaborador reciba una retroalimentación justa, técnica y profundamente alineada con los objetivos estratégicos de la organización.
