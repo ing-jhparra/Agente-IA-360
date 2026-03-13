@@ -9,12 +9,12 @@
 
 # Contenido
 
-* [Descripción](#Descripción})
-* [Stack Tecnológico](#Stack-Tecnológico)
-* [Arquitectura RAG](#Arquitectura-RAG)
-* [Observaciones/Limitaciones](#observacioneslimitaciones)
-* [Workflow](#Workflow)
-* [Diagrama Entidad Relación](#Diagrama-Entidad-Relación)
+* [Descripción](#descripción})
+* [Stack Tecnológico](#stack-tecnológico)
+* [Arquitectura RAG](#arquitectura-RAG)
+* [Observaciones](#observaciones)
+* [Workflow](#workflow)
+* [Diagrama Entidad Relación](#diagrama-entidad-relación)
 * [Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos](#procedimientos-almacenados-y-funciones-plsql-utilizados-en-los-nodos)
 
 ## Descripción 
@@ -33,16 +33,12 @@ Este proceso automatizado con un agente de IA como Consultor 360 surge para resp
 El flujo de los datos, se maneja de forma cíclica y estructurada a través de las siguientes etapas:
 
 1. **Entrada de Datos (Carga Masiva)**: La información inicial (nombres, cargos, correos, etc.) se extrae desde un Google Sheet para alimentar la base de datos de empleados.
-
 2. **Procesamiento y Validación**: Antes de cualquier inserción, el flujo utiliza nodos de JavaScript para formatear datos críticos como las fechas de ingreso. Posteriormente, consulta en PostgreSQL si el empleado o la relación de evaluación ya existen para evitar duplicados.
-
 3. **Almacenamiento Estructurado**: Las calificaciones y relaciones se guardan en tablas de PostgreSQL mediante llamadas a procedimientos almacenados como insertar_detalle_evaluacion e insertar_relacion_evaluacion.
-
 4. **Transformación para Reportes**: Para generar el informe, el sistema recupera los promedios y porcentajes calculados en la base de datos. Estos datos numéricos se envían a la API de QuickChart para transformarlos en gráficas visuales (radar y barras).
-
 5. **Salida de Información**: Finalmente, los resultados procesados y las imágenes de las gráficas se integran en una plantilla HTML para ser enviados por correo electrónico a cada evaluado.
 
-## Observaciones/Limitaciones
+## Observaciones
 
 Este sistema implementa una arquitectura RAG basada en datos estructurados que sustituye las bases de datos vectoriales por una fuente de conocimiento en Google Sheets. La gestión se realiza desde Laravel, utilizando plantillas Blade para estandarizar la carga de información. Posteriormente, un flujo automatizado sincroniza estos datos hacia tablas en PostgreSQL, permitiendo que el agente de IA consulte registros organizados y precisos. Esto garantiza una recuperación de datos exacta, auditable y fácilmente gestionable por el equipo administrativo.
 
