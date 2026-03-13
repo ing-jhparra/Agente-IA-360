@@ -12,7 +12,7 @@
 * [Descripción](#Descripción})
 * [Stack Tecnológico](#Stack-Tecnológico)
 * [Arquitectura RAG](#Arquitectura-RAG)
-* [Observaciones/Limitaciones](#observaciones-limitaciones)
+* [Observaciones/Limitaciones](#observacioneslimitaciones)
 * [Workflow](#Workflow)
 * [Diagrama Entidad Relación](#Diagrama-Entidad-Relación)
 * [Procedimientos Almacenados y Funciones PL/SQL utilizados en los nodos](#procedimientos-almacenados-y-funciones-plsql-utilizados-en-los-nodos)
