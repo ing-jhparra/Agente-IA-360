@@ -50,6 +50,8 @@ Haz clic en el siguiente enlace para obtener el archivo JSON con la configuraci�
 
 [Descargar el Workflow de Evaluación 360](https://raw.githubusercontent.com/ing-jhparra/Agente-IA-360/refs/heads/main/scripts/Evaluacion%20360.json)
 
+[Descargar base de datos desarrollo](https://raw.githubusercontent.com/ing-jhparra/Agente-IA-360/refs/heads/main/scripts/db_evalauacion360.sql)
+
 ## 1. Carga de Empleados
 
 Este flujo automatiza la sincronización de personal extrayendo datos de Google Sheets para procesarlos individualmente. Tras limpiar y formatear atributos como la fecha de ingreso, el sistema valida la existencia de cada registro en la base de datos para evitar duplicados. Si el empleado es nuevo, se inserta automáticamente; de lo contrario, el proceso continúa hasta completar la lista.
