@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 1. Flujo para la carga de Empleados\n### Se esta utilizado un Google Sheet para la carga de empleado, los atributos para la tabla  es:\n- nombre_empleado\n- apellido_empleado\n- fecha_ingreso\n- cargo\n- nombres_apellidos\n- identificacion\n- correo\n- id_unidad\n\n### Se requiere una unica carga masiva y en  el futuro crear un modulo de insercion de empleado\n\n\n\n\n\n\n",
+        "content": "## Flujo 1. Carga de Empleados\n### Se esta utilizado un Google Sheet para la carga de empleado, los atributos para la tabla  es:\n- nombre_empleado\n- apellido_empleado\n- fecha_ingreso\n- cargo\n- nombres_apellidos\n- identificacion\n- correo\n- id_unidad\n\n### Se requiere una unica carga masiva y en  el futuro crear un modulo de insercion de empleado\n\n\n\n\n\n\n",
         "height": 800,
         "width": 896
       },
@@ -877,7 +877,7 @@
     },
     {
       "parameters": {
-        "content": "## Flujo 3. Cargar de Evaluacion y Calculos",
+        "content": "## Flujo 3. Carga de Calificaciones y Calculos",
         "height": 800,
         "width": 896,
         "color": 4
@@ -893,7 +893,7 @@
     },
     {
       "parameters": {
-        "content": "## 2. Flujo de carga Configuracion de Relaciones\n- Supervisor\n- Subordinado\n- Par o Externo\n- Cliente\n- Autoevaluacion\n\n## Formulario de Configuracion  de Relaciones\n- https://configurar-relaciones.pages.dev/",
+        "content": "## Flujo 2.  Carga de  Configuracion de Relaciones\n- Supervisor\n- Subordinado\n- Par o Externo\n- Cliente\n- Autoevaluacion\n\n## Formulario de Configuracion  de Relaciones\n- https://configurar-relaciones.pages.dev/",
         "height": 768,
         "width": 896,
         "color": 6
@@ -983,7 +983,7 @@
     },
     {
       "parameters": {
-        "content": "## Flujo 5. Evaluacion 360 por la IA",
+        "content": "## Flujo 5. Evaluacion 360 por el Agente IA",
         "height": 800,
         "width": 912
       },
@@ -1502,7 +1502,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT ROUND(AVG(promedio_general),2) as promedio, ROUND(AVG(promedio_general)/5*100,0) as porcentaje FROM obtener_estadisticas_evaluado(2);",
+        "query": "SELECT ROUND(AVG(promedio_general),2) as promedio, ROUND(AVG(promedio_general)/5*100,0) as porcentaje FROM obtener_estadisticas_evaluado({{ $('Procesar reporte del evaluado').item.json.id_evaluado }});",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -1834,12 +1834,11 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -4336,
-        4784
+        -4944,
+        960
       ],
       "id": "4d152126-f99b-4e4f-968f-931b0a5eeae2",
-      "name": "When clicking ‘Execute workflow’",
-      "disabled": true
+      "name": "When clicking ‘Execute workflow’"
     }
   ],
   "pinData": {},
@@ -2693,13 +2692,24 @@
           }
         ]
       ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Obtener ids de evaluados1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d27e8d34-8479-48e3-8559-065622c2720d",
+  "versionId": "930a6511-d647-41e9-b071-2df8018b6269",
   "meta": {
     "instanceId": "f01fdce172c199b86bd72c34f38a516a7680d2acb32e6a2517a83199b1dbf844"
   },
